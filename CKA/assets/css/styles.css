@@ -1195,26 +1195,33 @@ mark.search-hit.active {
   scroll-margin-top: 6rem;
   border-radius: .2rem;
 }
-@keyframes search-spotlight {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 75%, transparent);
-    background: #fffbeb;
-  }
-  35% {
-    box-shadow: 0 0 0 8px color-mix(in srgb, var(--warn) 38%, transparent), 0 0 22px 6px color-mix(in srgb, var(--warn) 55%, transparent);
-  }
-  100% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent);
-    background: var(--warn);
-  }
+
+/* Full-screen spotlight that converges onto the active keyword. */
+.search-spotlight {
+  display: none;
+  position: fixed;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1000;
+  box-shadow: 0 0 0 9999px rgba(2, 6, 23, .55), 0 0 36px 10px color-mix(in srgb, var(--warn) 55%, transparent) inset;
 }
-mark.search-hit.flash {
-  animation: search-spotlight 1.15s ease-out 1;
+.search-spotlight.run {
+  display: block;
+  animation: search-spotlight-converge 1.3s cubic-bezier(.2, .7, .2, 1) 1;
+}
+@keyframes search-spotlight-converge {
+  0% { width: 260vmax; height: 260vmax; opacity: 0; }
+  18% { opacity: 1; }
+  55% { width: 140px; height: 140px; opacity: 1; }
+  80% { width: 140px; height: 140px; opacity: 1; }
+  100% { width: 140px; height: 140px; opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-  mark.search-hit.flash {
-    animation: none;
-  }
+  .search-spotlight.run { animation: none; display: none; }
 }
 
 @media (max-width: 860px) {

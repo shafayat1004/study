@@ -379,20 +379,68 @@ function closeSearch() {
   searchOpen = false;
 }
 
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+let spotlightEl;
+
+function getSpotlight() {
+  if (!spotlightEl) {
+    spotlightEl = document.createElement("div");
+    spotlightEl.className = "search-spotlight";
+    spotlightEl.setAttribute("aria-hidden", "true");
+    spotlightEl.addEventListener("animationend", () => spotlightEl.classList.remove("run"));
+    document.body.appendChild(spotlightEl);
+  }
+  return spotlightEl;
+}
+
+// Smooth-scroll to a target offset, then run a callback once scrolling settles.
+function afterScrollSettled(targetTop, callback) {
+  if (Math.abs(window.scrollY - targetTop) < 2) { callback(); return; }
+  window.scrollTo({ top: targetTop, behavior: "smooth" });
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    window.removeEventListener("scrollend", finish);
+    clearTimeout(timer);
+    callback();
+  };
+  window.addEventListener("scrollend", finish);
+  const timer = setTimeout(finish, 900);
+}
+
+// Scroll so the keyword sits at the vertical center, then sweep a full-screen
+// spotlight that converges from the whole screen onto that exact word.
+function centerAndSpotlight(mark) {
+  const rect = mark.getBoundingClientRect();
+  const docCenterY = rect.top + window.scrollY + rect.height / 2;
+  const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  const desired = Math.min(Math.max(docCenterY - window.innerHeight / 2, 0), maxScroll);
+  if (reduceMotion.matches) {
+    window.scrollTo({ top: desired, behavior: "auto" });
+    return;
+  }
+  afterScrollSettled(desired, () => {
+    const r = mark.getBoundingClientRect();
+    const el = getSpotlight();
+    el.style.left = `${r.left + r.width / 2}px`;
+    el.style.top = `${r.top + r.height / 2}px`;
+    el.classList.remove("run");
+    void el.offsetWidth;
+    el.classList.add("run");
+  });
+}
+
 function gotoHit(index, collapseOnMobile) {
   if (!hits.length) return;
   activeHit = (index + hits.length) % hits.length;
   hits.forEach((h, j) => {
     h.mark.classList.toggle("active", j === activeHit);
-    h.mark.classList.remove("flash");
     if (h.card) h.card.classList.toggle("active", j === activeHit);
   });
   const target = hits[activeHit];
   if (target.card) target.card.scrollIntoView({ block: "nearest" });
-  target.mark.scrollIntoView({ block: "center", behavior: "smooth" });
-  // Restart the attention pulse even when re-selecting the same hit.
-  void target.mark.offsetWidth;
-  target.mark.classList.add("flash");
+  centerAndSpotlight(target.mark);
   updateCount();
   if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
 }
