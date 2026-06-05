@@ -1,42 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" aria-label="RBAC relationship between subjects, bindings, roles, and permissions" class="diagram" role="img" viewBox="0 0 1120 360">
-<style><![CDATA[
-.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
-.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
-.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
-.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
-.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
-.dashed { stroke-dasharray: 8 8; }
-.arrow { fill: var(--muted, #64748b); }
-.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
-.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
-.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
-.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
-.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
-.ok-arrow { fill: var(--good, #22c55e); }
-.bad-arrow { fill: var(--warn, #f59e0b); }
-.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
-]]></style>
-<defs><marker id="arrowRbac" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<text class="title" x="20" y="40">Namespaced</text>
-<rect class="pod" height="76" rx="16" width="210" x="20" y="62"></rect><text class="label" x="44" y="98">Subject</text><text class="tiny" x="44" y="122">SA / User / Group</text>
-<rect class="ctrl" height="76" rx="16" width="200" x="300" y="62"></rect><text class="label" x="328" y="105">RoleBinding</text>
-<rect class="node" height="76" rx="16" width="170" x="570" y="62"></rect><text class="label" x="620" y="105">Role</text>
-<rect class="node api" height="76" rx="16" width="290" x="810" y="62"></rect><text class="label" x="836" y="98">verbs · resources</text><text class="tiny" x="836" y="122">get, list, watch · pods</text>
-<path class="line" d="M230 100 H300" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M500 100 H570" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M740 100 H810" marker-end="url(#arrowRbac)"></path>
-<text class="title" x="20" y="240">Cluster-wide</text>
-<rect class="pod" height="76" rx="16" width="210" x="20" y="262"></rect><text class="label" x="44" y="298">Subject</text><text class="tiny" x="44" y="322">SA / User / Group</text>
-<rect class="ctrl" height="76" rx="16" width="200" x="300" y="262"></rect><text class="tiny" x="320" y="296">ClusterRole-</text><text class="tiny" x="320" y="318">Binding</text>
-<rect class="node" height="76" rx="16" width="170" x="570" y="262"></rect><text class="label" x="600" y="305">ClusterRole</text>
-<rect class="node api" height="76" rx="16" width="290" x="810" y="262"></rect><text class="label" x="836" y="298">cluster-scoped</text><text class="tiny" x="836" y="322">nodes, PVs, namespaces…</text>
-<path class="line" d="M230 300 H300" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M500 300 H570" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M740 300 H810" marker-end="url(#arrowRbac)"></path>
+<defs><marker id="arrowRbac" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" fill="#64748b"></path></marker></defs>
+<text class="title" x="20" y="40" fill="#111827" font-size="28" font-weight="900">Namespaced</text>
+<rect class="pod" height="76" rx="16" width="210" x="20" y="62" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="label" x="44" y="98" fill="#111827" font-size="20" font-weight="800">Subject</text><text class="tiny" x="44" y="122" fill="#64748b" font-size="16" font-weight="700">SA / User / Group</text>
+<rect class="ctrl" height="76" rx="16" width="200" x="300" y="62" fill="#ede9fe" stroke="#b69bf2" stroke-width="2"></rect><text class="label" x="328" y="105" fill="#111827" font-size="20" font-weight="800">RoleBinding</text>
+<rect class="node" height="76" rx="16" width="170" x="570" y="62" fill="#ffffff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="620" y="105" fill="#111827" font-size="20" font-weight="800">Role</text>
+<rect class="node api" height="76" rx="16" width="290" x="810" y="62" fill="#dce8ff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="836" y="98" fill="#111827" font-size="20" font-weight="800">verbs · resources</text><text class="tiny" x="836" y="122" fill="#64748b" font-size="16" font-weight="700">get, list, watch · pods</text>
+<path class="line" d="M230 100 H300" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M500 100 H570" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M740 100 H810" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<text class="title" x="20" y="240" fill="#111827" font-size="28" font-weight="900">Cluster-wide</text>
+<rect class="pod" height="76" rx="16" width="210" x="20" y="262" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="label" x="44" y="298" fill="#111827" font-size="20" font-weight="800">Subject</text><text class="tiny" x="44" y="322" fill="#64748b" font-size="16" font-weight="700">SA / User / Group</text>
+<rect class="ctrl" height="76" rx="16" width="200" x="300" y="262" fill="#ede9fe" stroke="#b69bf2" stroke-width="2"></rect><text class="tiny" x="320" y="296" fill="#64748b" font-size="16" font-weight="700">ClusterRole-</text><text class="tiny" x="320" y="318" fill="#64748b" font-size="16" font-weight="700">Binding</text>
+<rect class="node" height="76" rx="16" width="170" x="570" y="262" fill="#ffffff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="600" y="305" fill="#111827" font-size="20" font-weight="800">ClusterRole</text>
+<rect class="node api" height="76" rx="16" width="290" x="810" y="262" fill="#dce8ff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="836" y="298" fill="#111827" font-size="20" font-weight="800">cluster-scoped</text><text class="tiny" x="836" y="322" fill="#64748b" font-size="16" font-weight="700">nodes, PVs, namespaces…</text>
+<path class="line" d="M230 300 H300" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M500 300 H570" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M740 300 H810" marker-end="url(#arrowRbac)" fill="none" stroke="#64748b" stroke-width="3"></path>
 </svg>

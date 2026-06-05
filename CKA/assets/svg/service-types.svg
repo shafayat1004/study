@@ -1,46 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" aria-label="Service types comparison" class="diagram" role="img" viewBox="0 0 1120 380">
-<style><![CDATA[
-.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
-.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
-.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
-.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
-.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
-.dashed { stroke-dasharray: 8 8; }
-.arrow { fill: var(--muted, #64748b); }
-.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
-.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
-.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
-.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
-.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
-.ok-arrow { fill: var(--good, #22c55e); }
-.bad-arrow { fill: var(--warn, #f59e0b); }
-.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
-]]></style>
-<defs><marker id="arrowSvc" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="api node" height="64" rx="14" width="150" x="20" y="60"></rect><text class="tiny" x="44" y="88">external</text><text class="tiny" x="44" y="108">client</text>
-<rect class="gate" height="64" rx="14" width="180" x="210" y="60"></rect><text class="label" x="232" y="90">LoadBalancer</text><text class="tiny" x="232" y="110">cloud external IP</text>
-<rect class="gate" height="64" rx="14" width="180" x="430" y="60"></rect><text class="label" x="452" y="90">NodePort</text><text class="tiny" x="452" y="110">NodeIP:30000-32767</text>
-<rect class="gate" height="64" rx="14" width="170" x="650" y="60"></rect><text class="label" x="672" y="90">ClusterIP</text><text class="tiny" x="672" y="110">virtual IP (default)</text>
-<rect class="pod" height="64" rx="14" width="190" x="860" y="60"></rect><text class="label" x="900" y="98">Pods</text>
-<path class="line" d="M170 92 H210" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M390 92 H430" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M610 92 H650" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M820 92 H860" marker-end="url(#arrowSvc)"></path>
-<text class="tiny" x="210" y="150">each type builds on the one to its right</text>
-<line class="divider" x1="20" x2="1100" y1="200" y2="200"></line>
-<text class="title" x="20" y="244">Headless (clusterIP: None)</text>
-<rect class="node" height="70" rx="14" width="230" x="20" y="266"></rect><text class="tiny" x="42" y="296">DNS query for</text><text class="tiny" x="42" y="318">the Service name</text>
-<rect class="ctrl" height="70" rx="14" width="160" x="300" y="266"></rect><text class="label" x="328" y="308">CoreDNS</text>
-<rect class="pod" height="70" rx="14" width="170" x="540" y="266"></rect><text class="tiny" x="560" y="296">Pod A IP</text>
-<rect class="pod" height="70" rx="14" width="170" x="760" y="266"></rect><text class="tiny" x="780" y="296">Pod B IP</text>
-<path class="line" d="M250 301 H300" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M460 301 H540" marker-end="url(#arrowSvc)"></path>
-<path class="line dashed" d="M620 336 C660 360 720 360 760 336" marker-end="url(#arrowSvc)"></path>
-<text class="tiny" x="540" y="360">no VIP — DNS returns Pod IPs directly</text>
+<defs><marker id="arrowSvc" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" fill="#64748b"></path></marker></defs>
+<rect class="api node" height="64" rx="14" width="150" x="20" y="60" fill="#ffffff" stroke="#9bb4ee" stroke-width="2"></rect><text class="tiny" x="44" y="88" fill="#64748b" font-size="16" font-weight="700">external</text><text class="tiny" x="44" y="108" fill="#64748b" font-size="16" font-weight="700">client</text>
+<rect class="gate" height="64" rx="14" width="180" x="210" y="60" fill="#e5edff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="232" y="90" fill="#111827" font-size="20" font-weight="800">LoadBalancer</text><text class="tiny" x="232" y="110" fill="#64748b" font-size="16" font-weight="700">cloud external IP</text>
+<rect class="gate" height="64" rx="14" width="180" x="430" y="60" fill="#e5edff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="452" y="90" fill="#111827" font-size="20" font-weight="800">NodePort</text><text class="tiny" x="452" y="110" fill="#64748b" font-size="16" font-weight="700">NodeIP:30000-32767</text>
+<rect class="gate" height="64" rx="14" width="170" x="650" y="60" fill="#e5edff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="672" y="90" fill="#111827" font-size="20" font-weight="800">ClusterIP</text><text class="tiny" x="672" y="110" fill="#64748b" font-size="16" font-weight="700">virtual IP (default)</text>
+<rect class="pod" height="64" rx="14" width="190" x="860" y="60" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="label" x="900" y="98" fill="#111827" font-size="20" font-weight="800">Pods</text>
+<path class="line" d="M170 92 H210" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M390 92 H430" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M610 92 H650" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M820 92 H860" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<text class="tiny" x="210" y="150" fill="#64748b" font-size="16" font-weight="700">each type builds on the one to its right</text>
+<line class="divider" x1="20" x2="1100" y1="200" y2="200" stroke="#d9e2ef" stroke-width="2"></line>
+<text class="title" x="20" y="244" fill="#111827" font-size="28" font-weight="900">Headless (clusterIP: None)</text>
+<rect class="node" height="70" rx="14" width="230" x="20" y="266" fill="#ffffff" stroke="#9bb4ee" stroke-width="2"></rect><text class="tiny" x="42" y="296" fill="#64748b" font-size="16" font-weight="700">DNS query for</text><text class="tiny" x="42" y="318" fill="#64748b" font-size="16" font-weight="700">the Service name</text>
+<rect class="ctrl" height="70" rx="14" width="160" x="300" y="266" fill="#ede9fe" stroke="#b69bf2" stroke-width="2"></rect><text class="label" x="328" y="308" fill="#111827" font-size="20" font-weight="800">CoreDNS</text>
+<rect class="pod" height="70" rx="14" width="170" x="540" y="266" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="560" y="296" fill="#64748b" font-size="16" font-weight="700">Pod A IP</text>
+<rect class="pod" height="70" rx="14" width="170" x="760" y="266" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="780" y="296" fill="#64748b" font-size="16" font-weight="700">Pod B IP</text>
+<path class="line" d="M250 301 H300" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M460 301 H540" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line dashed" d="M620 336 C660 360 720 360 760 336" marker-end="url(#arrowSvc)" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="8 8"></path>
+<text class="tiny" x="540" y="360" fill="#64748b" font-size="16" font-weight="700">no VIP — DNS returns Pod IPs directly</text>
 </svg>

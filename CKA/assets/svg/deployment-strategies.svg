@@ -1,44 +1,21 @@
 <svg xmlns="http://www.w3.org/2000/svg" aria-label="Blue-green and canary deployment strategies" class="diagram" role="img" viewBox="0 0 1120 320">
-<style><![CDATA[
-.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
-.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
-.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
-.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
-.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
-.dashed { stroke-dasharray: 8 8; }
-.arrow { fill: var(--muted, #64748b); }
-.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
-.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
-.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
-.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
-.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
-.ok-arrow { fill: var(--good, #22c55e); }
-.bad-arrow { fill: var(--warn, #f59e0b); }
-.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
-]]></style>
 <defs>
-<marker id="arrowDep" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-<marker id="arrowDepMute" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" opacity="0.5"></path></marker>
+<marker id="arrowDep" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" fill="#64748b"></path></marker>
+<marker id="arrowDepMute" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" opacity="0.5" fill="#64748b"></path></marker>
 </defs>
-<text class="title" x="20" y="40">Blue-green</text>
-<rect class="gate" height="60" rx="14" width="160" x="20" y="120"></rect><text class="label" x="46" y="156">Service</text>
-<rect class="pod" height="60" rx="14" width="180" x="270" y="60"></rect><text class="tiny" x="292" y="88">v1 (blue)</text><text class="tiny" x="292" y="110">live</text>
-<rect class="node" height="60" rx="14" width="180" x="270" y="190"></rect><text class="tiny" x="292" y="218">v2 (green)</text><text class="tiny" x="292" y="240">staged, idle</text>
-<path class="ok-line" d="M180 145 C220 120 240 100 270 90" marker-end="url(#arrowDep)"></path>
-<path class="line dashed" d="M180 155 C220 185 240 200 270 220" marker-end="url(#arrowDepMute)"></path>
-<text class="tiny" x="270" y="285">flip the Service selector to cut over instantly (and roll back just as fast)</text>
-<line class="divider" x1="560" x2="560" y1="30" y2="300"></line>
-<text class="title" x="600" y="40">Canary</text>
-<rect class="gate" height="60" rx="14" width="160" x="600" y="120"></rect><text class="label" x="626" y="156">Service</text>
-<rect class="pod" height="60" rx="14" width="200" x="850" y="70"></rect><text class="tiny" x="872" y="98">v1 — most Pods</text><text class="tiny" x="872" y="120">90% traffic</text>
-<rect class="ctrl" height="60" rx="14" width="200" x="850" y="190"></rect><text class="tiny" x="872" y="218">v2 — few Pods</text><text class="tiny" x="872" y="240">10% traffic</text>
-<path class="line" d="M760 145 C800 120 820 105 850 100" marker-end="url(#arrowDep)"></path>
-<path class="line" d="M760 155 C800 185 820 205 850 215" marker-end="url(#arrowDep)"></path>
-<text class="tiny" x="600" y="285">one Service, shared label selector; replica ratio sets the traffic split</text>
+<text class="title" x="20" y="40" fill="#111827" font-size="28" font-weight="900">Blue-green</text>
+<rect class="gate" height="60" rx="14" width="160" x="20" y="120" fill="#e5edff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="46" y="156" fill="#111827" font-size="20" font-weight="800">Service</text>
+<rect class="pod" height="60" rx="14" width="180" x="270" y="60" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="292" y="88" fill="#64748b" font-size="16" font-weight="700">v1 (blue)</text><text class="tiny" x="292" y="110" fill="#64748b" font-size="16" font-weight="700">live</text>
+<rect class="node" height="60" rx="14" width="180" x="270" y="190" fill="#ffffff" stroke="#9bb4ee" stroke-width="2"></rect><text class="tiny" x="292" y="218" fill="#64748b" font-size="16" font-weight="700">v2 (green)</text><text class="tiny" x="292" y="240" fill="#64748b" font-size="16" font-weight="700">staged, idle</text>
+<path class="ok-line" d="M180 145 C220 120 240 100 270 90" marker-end="url(#arrowDep)" fill="none" stroke="#22c55e" stroke-width="3"></path>
+<path class="line dashed" d="M180 155 C220 185 240 200 270 220" marker-end="url(#arrowDepMute)" fill="none" stroke="#64748b" stroke-width="3" stroke-dasharray="8 8"></path>
+<text class="tiny" x="270" y="285" fill="#64748b" font-size="16" font-weight="700">flip the Service selector to cut over instantly (and roll back just as fast)</text>
+<line class="divider" x1="560" x2="560" y1="30" y2="300" stroke="#d9e2ef" stroke-width="2"></line>
+<text class="title" x="600" y="40" fill="#111827" font-size="28" font-weight="900">Canary</text>
+<rect class="gate" height="60" rx="14" width="160" x="600" y="120" fill="#e5edff" stroke="#9bb4ee" stroke-width="2"></rect><text class="label" x="626" y="156" fill="#111827" font-size="20" font-weight="800">Service</text>
+<rect class="pod" height="60" rx="14" width="200" x="850" y="70" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="872" y="98" fill="#64748b" font-size="16" font-weight="700">v1 — most Pods</text><text class="tiny" x="872" y="120" fill="#64748b" font-size="16" font-weight="700">90% traffic</text>
+<rect class="ctrl" height="60" rx="14" width="200" x="850" y="190" fill="#ede9fe" stroke="#b69bf2" stroke-width="2"></rect><text class="tiny" x="872" y="218" fill="#64748b" font-size="16" font-weight="700">v2 — few Pods</text><text class="tiny" x="872" y="240" fill="#64748b" font-size="16" font-weight="700">10% traffic</text>
+<path class="line" d="M760 145 C800 120 820 105 850 100" marker-end="url(#arrowDep)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<path class="line" d="M760 155 C800 185 820 205 850 215" marker-end="url(#arrowDep)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<text class="tiny" x="600" y="285" fill="#64748b" font-size="16" font-weight="700">one Service, shared label selector; replica ratio sets the traffic split</text>
 </svg>

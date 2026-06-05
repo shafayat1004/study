@@ -1,37 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" aria-label="Kubernetes pod networking model" class="diagram" role="img" viewBox="0 0 1120 340">
-<style><![CDATA[
-.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
-.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
-.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
-.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
-.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
-.dashed { stroke-dasharray: 8 8; }
-.arrow { fill: var(--muted, #64748b); }
-.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
-.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
-.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
-.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
-.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
-.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
-.ok-arrow { fill: var(--good, #22c55e); }
-.bad-arrow { fill: var(--warn, #f59e0b); }
-.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
-.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
-]]></style>
-<defs><marker id="arrowNet" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="box" height="190" rx="20" width="420" x="40" y="60"></rect><text class="tiny" x="64" y="92">node-1 · podCIDR 10.244.1.0/24</text>
-<rect class="pod" height="54" rx="12" width="170" x="64" y="120"></rect><text class="tiny" x="84" y="152">pod 10.244.1.2</text>
-<rect class="pod" height="54" rx="12" width="170" x="254" y="120"></rect><text class="tiny" x="274" y="152">pod 10.244.1.3</text>
-<text class="tiny" x="64" y="220">CNI plugin assigns IPs &amp; wires the network</text>
-<rect class="box" height="190" rx="20" width="420" x="660" y="60"></rect><text class="tiny" x="684" y="92">node-2 · podCIDR 10.244.2.0/24</text>
-<rect class="pod" height="54" rx="12" width="170" x="684" y="120"></rect><text class="tiny" x="704" y="152">pod 10.244.2.2</text>
-<rect class="pod" height="54" rx="12" width="170" x="874" y="120"></rect><text class="tiny" x="894" y="152">pod 10.244.2.4</text>
-<text class="tiny" x="684" y="220">CNI plugin assigns IPs &amp; wires the network</text>
-<path class="line" d="M460 147 H660" marker-end="url(#arrowNet)"></path><path class="line" d="M660 165 H460" marker-end="url(#arrowNet)"></path>
-<text class="tiny" x="476" y="138">flat L3: any Pod IP reaches any Pod IP, no NAT</text>
-<rect class="ctrl" height="50" rx="14" width="420" x="360" y="280"></rect><text class="label" x="384" y="305">Service CIDR 10.96.0.0/12 — virtual</text><text class="tiny" x="384" y="324">kube-proxy maps it to Pod IPs (iptables or IPVS)</text>
+<defs><marker id="arrowNet" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" fill="#64748b"></path></marker></defs>
+<rect class="box" height="190" rx="20" width="420" x="40" y="60" fill="#eef4ff" stroke="#d9e2ef" stroke-width="2"></rect><text class="tiny" x="64" y="92" fill="#64748b" font-size="16" font-weight="700">node-1 · podCIDR 10.244.1.0/24</text>
+<rect class="pod" height="54" rx="12" width="170" x="64" y="120" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="84" y="152" fill="#64748b" font-size="16" font-weight="700">pod 10.244.1.2</text>
+<rect class="pod" height="54" rx="12" width="170" x="254" y="120" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="274" y="152" fill="#64748b" font-size="16" font-weight="700">pod 10.244.1.3</text>
+<text class="tiny" x="64" y="220" fill="#64748b" font-size="16" font-weight="700">CNI plugin assigns IPs &amp; wires the network</text>
+<rect class="box" height="190" rx="20" width="420" x="660" y="60" fill="#eef4ff" stroke="#d9e2ef" stroke-width="2"></rect><text class="tiny" x="684" y="92" fill="#64748b" font-size="16" font-weight="700">node-2 · podCIDR 10.244.2.0/24</text>
+<rect class="pod" height="54" rx="12" width="170" x="684" y="120" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="704" y="152" fill="#64748b" font-size="16" font-weight="700">pod 10.244.2.2</text>
+<rect class="pod" height="54" rx="12" width="170" x="874" y="120" fill="#dcfce7" stroke="#6edb8d" stroke-width="2"></rect><text class="tiny" x="894" y="152" fill="#64748b" font-size="16" font-weight="700">pod 10.244.2.4</text>
+<text class="tiny" x="684" y="220" fill="#64748b" font-size="16" font-weight="700">CNI plugin assigns IPs &amp; wires the network</text>
+<path class="line" d="M460 147 H660" marker-end="url(#arrowNet)" fill="none" stroke="#64748b" stroke-width="3"></path><path class="line" d="M660 165 H460" marker-end="url(#arrowNet)" fill="none" stroke="#64748b" stroke-width="3"></path>
+<text class="tiny" x="476" y="138" fill="#64748b" font-size="16" font-weight="700">flat L3: any Pod IP reaches any Pod IP, no NAT</text>
+<rect class="ctrl" height="50" rx="14" width="420" x="360" y="280" fill="#ede9fe" stroke="#b69bf2" stroke-width="2"></rect><text class="label" x="384" y="305" fill="#111827" font-size="20" font-weight="800">Service CIDR 10.96.0.0/12 — virtual</text><text class="tiny" x="384" y="324" fill="#64748b" font-size="16" font-weight="700">kube-proxy maps it to Pod IPs (iptables or IPVS)</text>
 </svg>
