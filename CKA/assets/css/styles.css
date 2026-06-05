@@ -789,6 +789,14 @@ code {
     page-break-before: auto !important;
     break-after: page !important;
     page-break-after: always !important;
+    min-height: auto !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Keep the print title page focused on the guide title, not the screen stats cards. */
+  main > .stats {
+    display: none !important;
   }
 
   /* Keep headings attached to their first real content. */
