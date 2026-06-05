@@ -24,11 +24,13 @@
   <div class="mobile-bar">
     <div class="mobile-bar-row">
       <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
-      <strong>CKA Study Guide</strong>
+      <div class="mobile-bar-center">
+        <strong class="mobile-title">CKA Study Guide</strong>
+        <input aria-label="Search this guide" class="mobile-search-input" id="searchMobile"
+          placeholder="Search this guide..." type="search" />
+      </div>
+      <button aria-expanded="false" aria-label="Search this guide" id="searchToggleMobile" type="button">🔍</button>
       <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
-    </div>
-    <div class="mobile-search">
-      <input aria-label="Search this guide" id="searchMobile" placeholder="Search this guide..." type="search" />
     </div>
   </div>
   <div class="shell">

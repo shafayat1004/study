@@ -1045,21 +1045,49 @@ code {
 .mobile-bar-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: .6rem;
+  gap: .5rem;
 }
-.mobile-search input {
+.mobile-bar-row > button {
+  flex: 0 0 auto;
+  padding: .55rem .7rem;
+}
+.mobile-bar-center {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mobile-title {
+  font-size: .95rem;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.mobile-search-input {
+  display: none;
   width: 100%;
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: .6rem .8rem;
+  border-radius: 10px;
+  padding: .5rem .7rem;
   background: var(--paper-solid);
   color: var(--ink);
   font-size: .95rem;
   outline: none;
 }
-.mobile-search input:focus-visible {
+.mobile-search-input:focus-visible {
   border-color: var(--accent);
+}
+.mobile-bar.searching .mobile-title {
+  display: none;
+}
+.mobile-bar.searching .mobile-search-input {
+  display: block;
+}
+.mobile-bar.searching #searchToggleMobile {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .search-results {
@@ -1165,6 +1193,28 @@ mark.search-hit.active {
   color: #111827;
   outline: 2px solid color-mix(in srgb, var(--warn) 70%, #000);
   scroll-margin-top: 6rem;
+  border-radius: .2rem;
+}
+@keyframes search-spotlight {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 75%, transparent);
+    background: #fffbeb;
+  }
+  35% {
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--warn) 38%, transparent), 0 0 22px 6px color-mix(in srgb, var(--warn) 55%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent);
+    background: var(--warn);
+  }
+}
+mark.search-hit.flash {
+  animation: search-spotlight 1.15s ease-out 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  mark.search-hit.flash {
+    animation: none;
+  }
 }
 
 @media (max-width: 860px) {
@@ -1175,8 +1225,7 @@ mark.search-hit.active {
 }
 
 @media print {
-  .search-results,
-  .mobile-search {
+  .search-results {
     display: none !important;
   }
 }

@@ -246,11 +246,14 @@ let activeHit = -1;
 let searchTimer;
 
 const searchBoxEl = document.querySelector(".search-box");
-const mobileSearchEl = document.querySelector(".mobile-search");
+const mobileBarRowEl = document.querySelector(".mobile-bar-row");
+const searchToggleMobile = document.getElementById("searchToggleMobile");
+const mobileSearchInput = document.getElementById("searchMobile");
 
-// Dock the results panel directly under whichever search box is in use.
+// Dock the results panel directly under whichever search box is in use:
+// inside the sticky mobile bar on phones, under the sidebar search on desktop.
 function dockPanel(input) {
-  const anchor = input && input.id === "searchMobile" ? mobileSearchEl : searchBoxEl;
+  const anchor = input && input.id === "searchMobile" ? mobileBarRowEl : searchBoxEl;
   if (anchor && resultsPanel.previousElementSibling !== anchor) anchor.after(resultsPanel);
 }
 
@@ -381,13 +384,26 @@ function gotoHit(index, collapseOnMobile) {
   activeHit = (index + hits.length) % hits.length;
   hits.forEach((h, j) => {
     h.mark.classList.toggle("active", j === activeHit);
+    h.mark.classList.remove("flash");
     if (h.card) h.card.classList.toggle("active", j === activeHit);
   });
   const target = hits[activeHit];
   if (target.card) target.card.scrollIntoView({ block: "nearest" });
   target.mark.scrollIntoView({ block: "center", behavior: "smooth" });
+  // Restart the attention pulse even when re-selecting the same hit.
+  void target.mark.offsetWidth;
+  target.mark.classList.add("flash");
   updateCount();
   if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
+}
+
+function collapseMobileSearch() {
+  if (mobileBarEl) mobileBarEl.classList.remove("searching");
+  if (searchToggleMobile) {
+    searchToggleMobile.textContent = "🔍";
+    searchToggleMobile.setAttribute("aria-expanded", "false");
+    searchToggleMobile.setAttribute("aria-label", "Search this guide");
+  }
 }
 
 function clearSearch() {
@@ -397,6 +413,7 @@ function clearSearch() {
   activeHit = -1;
   searchInputs.forEach((input) => { if (input.value) input.value = ""; });
   closeSearch();
+  collapseMobileSearch();
 }
 
 function runSearch(rawValue, input) {
@@ -430,6 +447,20 @@ toggleListBtn.addEventListener("click", () => setListCollapsed(!resultsPanel.cla
 document.getElementById("searchNext").addEventListener("click", () => gotoHit(activeHit + 1, false));
 document.getElementById("searchPrev").addEventListener("click", () => gotoHit(activeHit - 1, false));
 document.getElementById("searchClear").addEventListener("click", clearSearch);
+
+if (searchToggleMobile) {
+  searchToggleMobile.addEventListener("click", () => {
+    const active = mobileBarEl.classList.toggle("searching");
+    if (active) {
+      searchToggleMobile.textContent = "✕";
+      searchToggleMobile.setAttribute("aria-expanded", "true");
+      searchToggleMobile.setAttribute("aria-label", "Close search");
+      mobileSearchInput.focus();
+    } else {
+      clearSearch();
+    }
+  });
+}
 
 document.querySelectorAll('a[target="_blank"]').forEach((link) => {
   const text = link.textContent.trim();
