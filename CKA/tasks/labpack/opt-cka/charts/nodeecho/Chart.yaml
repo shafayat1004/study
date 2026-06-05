@@ -1,0 +1,6 @@
+apiVersion: v2
+name: nodeecho
+description: Minimal echo server chart for CKA Helm practice (CA-04)
+type: application
+version: 0.1.0
+appVersion: "1.29"

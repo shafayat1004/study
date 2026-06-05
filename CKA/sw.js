@@ -1,4 +1,4 @@
-const CACHE_NAME = "cka-guide-v1";
+const CACHE_NAME = "cka-guide-v2";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -6,6 +6,10 @@ const APP_SHELL = [
   "./assets/favicon.svg",
   "./assets/css/styles.css",
   "./assets/js/app.js",
+  "./tasks/index.html",
+  "./tasks/tasks.json",
+  "./tasks/assets/tasks.css",
+  "./tasks/assets/tasks.js",
   "./assets/icons/apple-touch-icon.png",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png",

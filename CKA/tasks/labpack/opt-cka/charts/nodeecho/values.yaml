@@ -1,0 +1,6 @@
+replicaCount: 1
+image:
+  repository: registry.k8s.io/nginx
+  tag: "1.29"
+service:
+  port: 80

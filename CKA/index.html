@@ -60,7 +60,8 @@
         <p class="subtitle">A self-contained study guide for the CKA syllabus, with operational models, command
           patterns, guided labs, GKE notes, glossary, index, and diagrams.</p>
         <div class="hero-actions"><a href="#exam-scope-and-how-to-study-this-guide">Start studying</a><a
-            class="secondary" href="#guided-practice-framework-and-gke-notes">Jump to labs</a><a class="secondary"
+            href="tasks/index.html">Practice tasks</a><a class="secondary"
+            href="#guided-practice-framework-and-gke-notes">Jump to labs</a><a class="secondary"
             href="#verified-official-sources">Sources</a></div>
       </header>
       <section class="section-panel study-section" id="exam-scope-and-how-to-study-this-guide">
@@ -1120,7 +1121,7 @@ kubectl autoscale deploy/web --min=2 --max=8 --cpu-percent=60</code></pre>
         </div>
       </section>
       <section class="section-panel study-section" id="services-networking-and-storage">
-        <h2>Services, networking, and storage</h2>
+        <h2>Services and networking</h2>
         <div class="visual-card">
           <div class="visual-header"><span class="pill">Illustration</span><strong>Traffic and storage paths you should
               be able to debug</strong></div>
@@ -1251,70 +1252,6 @@ spec:
             (OR) or one combined entry (AND) completely changes what traffic is allowed. This is one of the most common
             "my policy looks right but blocks everything" bugs.</span>
         </div>
-        <p>Storage on the CKA is mostly about durable lifecycle, provisioning behavior, and claims matching. A
-          <strong>PersistentVolume</strong> is storage that exists as a cluster resource, either provisioned manually or
-          dynamically. A <strong>PersistentVolumeClaim</strong> is a user request for storage. A
-          <strong>StorageClass</strong> describes a class of storage and supplies the parameters used for dynamic
-          provisioning. Dynamic provisioning creates storage on demand when a claim asks for a StorageClass; without it,
-          administrators must pre-provision PVs. This PV/PVC/StorageClass triad is foundational for nearly every
-          stateful workload pattern in Kubernetes.</p>
-        <p>Claims request size and <strong>access modes</strong> such as <code>ReadWriteOnce</code>,
-          <code>ReadOnlyMany</code>, <code>ReadWriteMany</code>, and <code>ReadWriteOncePod</code>. Access modes are
-          used for matching claims and volumes, and in some cases they also constrain mount behavior. Reclaim policy
-          then decides what happens when the claim is released. For dynamically provisioned volumes, the default reclaim
-          policy is often <strong>Delete</strong>, but <strong>Retain</strong> is frequently the safer choice for
-          valuable data because it preserves the underlying volume for manual recovery after claim deletion.</p>
-        <p>A minimal StorageClass and PVC pair:</p>
-        <div class="code-wrap" data-copyable="true">
-          <div class="code-label">yaml</div>
-          <pre><code>apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: fast
-provisioner: &lt;csi-provisioner-name&gt;
-reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: data
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: fast
-  resources:
-    requests:
-      storage: 5Gi</code></pre>
-        </div>
-        <div class="svg-figure">
-          <div class="visual-header"><span class="pill">Illustration</span><strong>PVC binding and what reclaim policy
-              decides</strong></div>
-          <div class="diagram svg-placeholder" data-svg-src="assets/svg/storage-binding-reclaim.svg" role="img"
-            aria-label="PV PVC StorageClass binding and reclaim policy"></div>
-          <span class="cap">A PVC binds to a PV (often auto-created by a StorageClass).
-            <code>volumeBindingMode: WaitForFirstConsumer</code> delays provisioning until a Pod is scheduled so zonal
-            storage lands in the right zone. The reclaim policy decides the volume's fate after the claim is
-            gone.</span>
-        </div>
-        <div class="analogy">
-          <span class="tag">Analogy</span>
-          <p><strong>Storage is renting an apartment.</strong> The <strong>PVC</strong> is your rental application ("2
-            bedrooms, 5Gi, can-write-once"). The <strong>PV</strong> is the actual apartment you're matched to. The
-            <strong>StorageClass</strong> is the rental agency that can build a new unit on demand (dynamic
-            provisioning). <strong>Reclaim policy</strong> is the move-out clause: <em>Retain</em> keeps the apartment
-            and your furniture for later; <em>Delete</em> demolishes it the moment you hand back the keys.</p>
-        </div>
-        <p>Do not ignore ephemeral storage just because the exam has a separate persistent-storage domain. Kubernetes
-          supports several forms of <strong>ephemeral volumes</strong>, including <code>emptyDir</code>,
-          <code>configMap</code>, <code>secret</code>, <code>downwardAPI</code>, image volumes, and CSI ephemeral
-          volumes. Nodes also have <strong>local ephemeral storage</strong> used for writable layers,
-          <code>emptyDir</code>, logs, and related scratch data. This matters operationally because some node-pressure
-          situations are not memory problems or PV problems—they are ephemeral storage problems.</p>
-        <p>The connection back to StatefulSets is worth making explicit one more time: when a workload needs stable
-          network identity and persistent storage, StatefulSet plus a headless Service plus per-Pod claims is the
-          canonical pattern. That pattern appears again and again across databases, message queues, and clustered
-          systems, so it is worth practicing until it feels boring.</p>
         <div class="addendum" id="networkpolicy-ingress-gateway-gke">
           <h3>NetworkPolicy logic, Ingress vs Gateway API, and GKE networking</h3>
           <p>A key networking detail is the YAML selector logic for NetworkPolicy. Policies are additive: once a Pod is
@@ -1382,60 +1319,6 @@ spec:
               Pod CIDRs. VPC-native clusters also enable container-native load balancing with Network Endpoint Groups,
               where the Google Cloud load balancer can target Pod endpoints more directly instead of always sending
               traffic to a node first.</p>
-          </div>
-        </div>
-        <div class="addendum" id="storage-csi-local-nuance">
-          <h3>Local storage and CSI nuances from the expanded reference set</h3>
-          <p>The storage section is now expanded with two production-relevant details: local node storage must be pinned
-            to the node that actually owns the data, and cloud CSI drivers often expose provider-specific parameters
-            through StorageClass fields.</p>
-          <div class="two-col">
-            <div class="mini-card"><b>hostPath/local PV caution</b>
-              <p>Fast and simple, but the data stays on one node. Use node affinity so Pods using that PV schedule onto
-                the node that has the disk path.</p>
-            </div>
-            <div class="mini-card"><b>WaitForFirstConsumer</b>
-              <p>Delays provisioning until a Pod is scheduled, helping the provisioner create zonal storage in the same
-                zone as the selected node.</p>
-            </div>
-          </div>
-          <div class="code-wrap" data-copyable="true">
-            <div class="code-label">local PV with node affinity</div>
-            <pre><code>apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: local-harddrive-pv
-spec:
-  capacity:
-    storage: 50Gi
-  volumeMode: Filesystem
-  accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  storageClassName: local-storage
-  hostPath:
-    path: /mnt/data
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: kubernetes.io/hostname
-          operator: In
-          values:
-          - worker-node-01</code></pre>
-          </div>
-          <div class="code-wrap" data-copyable="true">
-            <div class="code-label">GCE PD CSI StorageClass pattern</div>
-            <pre><code>apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: pd-balanced-xfs
-provisioner: pd.csi.storage.gke.io
-parameters:
-  type: pd-balanced
-  csi.storage.k8s.io/fstype: xfs
-reclaimPolicy: Retain
-volumeBindingMode: WaitForFirstConsumer</code></pre>
           </div>
         </div>
         <div class="addendum" id="cluster-networking-model">
@@ -1561,6 +1444,128 @@ spec:
     - {protocol: TCP, port: 53}</code></pre>
           </div>
         </div>
+      </section>
+      <section class="section-panel study-section" id="storage">
+        <h2>Storage</h2>
+        <p>Storage is its own weighted CKA domain (10%), so it gets its own section here. It is mostly about durable
+          lifecycle, provisioning behavior, and claims matching. A
+          <strong>PersistentVolume</strong> is storage that exists as a cluster resource, either provisioned manually or
+          dynamically. A <strong>PersistentVolumeClaim</strong> is a user request for storage. A
+          <strong>StorageClass</strong> describes a class of storage and supplies the parameters used for dynamic
+          provisioning. Dynamic provisioning creates storage on demand when a claim asks for a StorageClass; without it,
+          administrators must pre-provision PVs. This PV/PVC/StorageClass triad is foundational for nearly every
+          stateful workload pattern in Kubernetes.</p>
+        <p>Claims request size and <strong>access modes</strong> such as <code>ReadWriteOnce</code>,
+          <code>ReadOnlyMany</code>, <code>ReadWriteMany</code>, and <code>ReadWriteOncePod</code>. Access modes are
+          used for matching claims and volumes, and in some cases they also constrain mount behavior. Reclaim policy
+          then decides what happens when the claim is released. For dynamically provisioned volumes, the default reclaim
+          policy is often <strong>Delete</strong>, but <strong>Retain</strong> is frequently the safer choice for
+          valuable data because it preserves the underlying volume for manual recovery after claim deletion.</p>
+        <p>A minimal StorageClass and PVC pair:</p>
+        <div class="code-wrap" data-copyable="true">
+          <div class="code-label">yaml</div>
+          <pre><code>apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: &lt;csi-provisioner-name&gt;
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: fast
+  resources:
+    requests:
+      storage: 5Gi</code></pre>
+        </div>
+        <div class="svg-figure">
+          <div class="visual-header"><span class="pill">Illustration</span><strong>PVC binding and what reclaim policy
+              decides</strong></div>
+          <div class="diagram svg-placeholder" data-svg-src="assets/svg/storage-binding-reclaim.svg" role="img"
+            aria-label="PV PVC StorageClass binding and reclaim policy"></div>
+          <span class="cap">A PVC binds to a PV (often auto-created by a StorageClass).
+            <code>volumeBindingMode: WaitForFirstConsumer</code> delays provisioning until a Pod is scheduled so zonal
+            storage lands in the right zone. The reclaim policy decides the volume's fate after the claim is
+            gone.</span>
+        </div>
+        <div class="analogy">
+          <span class="tag">Analogy</span>
+          <p><strong>Storage is renting an apartment.</strong> The <strong>PVC</strong> is your rental application ("2
+            bedrooms, 5Gi, can-write-once"). The <strong>PV</strong> is the actual apartment you're matched to. The
+            <strong>StorageClass</strong> is the rental agency that can build a new unit on demand (dynamic
+            provisioning). <strong>Reclaim policy</strong> is the move-out clause: <em>Retain</em> keeps the apartment
+            and your furniture for later; <em>Delete</em> demolishes it the moment you hand back the keys.</p>
+        </div>
+        <p>Do not ignore ephemeral storage just because the exam has a separate persistent-storage domain. Kubernetes
+          supports several forms of <strong>ephemeral volumes</strong>, including <code>emptyDir</code>,
+          <code>configMap</code>, <code>secret</code>, <code>downwardAPI</code>, image volumes, and CSI ephemeral
+          volumes. Nodes also have <strong>local ephemeral storage</strong> used for writable layers,
+          <code>emptyDir</code>, logs, and related scratch data. This matters operationally because some node-pressure
+          situations are not memory problems or PV problems—they are ephemeral storage problems.</p>
+        <p>The connection back to StatefulSets is worth making explicit one more time: when a workload needs stable
+          network identity and persistent storage, StatefulSet plus a headless Service plus per-Pod claims is the
+          canonical pattern. That pattern appears again and again across databases, message queues, and clustered
+          systems, so it is worth practicing until it feels boring.</p>
+        <div class="addendum" id="storage-csi-local-nuance">
+          <h3>Local storage and CSI nuances from the expanded reference set</h3>
+          <p>The storage section is now expanded with two production-relevant details: local node storage must be pinned
+            to the node that actually owns the data, and cloud CSI drivers often expose provider-specific parameters
+            through StorageClass fields.</p>
+          <div class="two-col">
+            <div class="mini-card"><b>hostPath/local PV caution</b>
+              <p>Fast and simple, but the data stays on one node. Use node affinity so Pods using that PV schedule onto
+                the node that has the disk path.</p>
+            </div>
+            <div class="mini-card"><b>WaitForFirstConsumer</b>
+              <p>Delays provisioning until a Pod is scheduled, helping the provisioner create zonal storage in the same
+                zone as the selected node.</p>
+            </div>
+          </div>
+          <div class="code-wrap" data-copyable="true">
+            <div class="code-label">local PV with node affinity</div>
+            <pre><code>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: local-harddrive-pv
+spec:
+  capacity:
+    storage: 50Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  hostPath:
+    path: /mnt/data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - worker-node-01</code></pre>
+          </div>
+          <div class="code-wrap" data-copyable="true">
+            <div class="code-label">GCE PD CSI StorageClass pattern</div>
+            <pre><code>apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: pd-balanced-xfs
+provisioner: pd.csi.storage.gke.io
+parameters:
+  type: pd-balanced
+  csi.storage.k8s.io/fstype: xfs
+reclaimPolicy: Retain
+volumeBindingMode: WaitForFirstConsumer</code></pre>
+          </div>
+        </div>
         <div class="addendum" id="volume-types-depth">
           <h3>Volume types you should recognize instantly</h3>
           <div class="two-col">
@@ -1624,6 +1629,111 @@ volumeMounts:
             rash: confirm the cluster and node are alive before blaming the application. And change <em>one thing at a
               time</em> — a clean partial fix that restores service beats a clever change that breaks three more
             components.</p>
+        </div>
+        <div class="addendum" id="common-broken-states">
+          <h3>Common broken states: symptom to first checks</h3>
+          <p>A compact lookup for "during-exam panic" moments. Match the symptom, then walk its checks in order.</p>
+          <table class="compact-table">
+            <thead>
+              <tr>
+                <th>Symptom</th>
+                <th>First checks, in order</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Symptom"><strong>ImagePullBackOff</strong></td>
+                <td data-label="First checks">Image name/tag, registry pull secret, node DNS, node egress.</td>
+              </tr>
+              <tr>
+                <td data-label="Symptom"><strong>CrashLoopBackOff</strong></td>
+                <td data-label="First checks"><code>logs --previous</code>, command/args, mounted config, secret mount.</td>
+              </tr>
+              <tr>
+                <td data-label="Symptom"><strong>Pending</strong></td>
+                <td data-label="First checks">Requests too high, taints, nodeSelector/affinity, unbound PVC.</td>
+              </tr>
+              <tr>
+                <td data-label="Symptom"><strong>Service has no traffic</strong></td>
+                <td data-label="First checks">Selector, targetPort, EndpointSlice, NetworkPolicy, CoreDNS.</td>
+              </tr>
+              <tr>
+                <td data-label="Symptom"><strong>NodeNotReady</strong></td>
+                <td data-label="First checks">kubelet, container runtime, CNI, certs, disk pressure.</td>
+              </tr>
+              <tr>
+                <td data-label="Symptom"><strong>API server down</strong></td>
+                <td data-label="First checks">Static Pod manifest, cert paths, etcd health, kubelet logs.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="addendum" id="exam-quick-check">
+          <h3>Exam quick-check</h3>
+          <p>Before marking any task done, run the highest-frequency checks. Wrong context, wrong namespace, and
+            unverified output lose the most points.</p>
+          <table class="compact-table">
+            <thead>
+              <tr>
+                <th>Check</th>
+                <th>Fast command or question</th>
+                <th>Why it matters</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td data-label="Check"><strong>Context</strong></td>
+                <td data-label="Command"><code>kubectl config current-context</code></td>
+                <td data-label="Why">Wrong cluster is the easiest way to lose points fast.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Namespace</strong></td>
+                <td data-label="Command"><code>kubectl config view --minify -o jsonpath='{..namespace}'</code></td>
+                <td data-label="Why">A correct object in the wrong namespace is still wrong.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Object exists</strong></td>
+                <td data-label="Command"><code>kubectl get ...</code></td>
+                <td data-label="Why">Do not trust an <code>apply</code> message alone.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Workload healthy</strong></td>
+                <td data-label="Command"><code>kubectl describe ...</code>, <code>kubectl rollout status ...</code></td>
+                <td data-label="Why">Events and rollout state reveal probe/image/scheduling failures early.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Service path</strong></td>
+                <td data-label="Command"><code>kubectl get svc,endpointslice</code></td>
+                <td data-label="Why">Service issues are usually selector or port issues.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>DNS works</strong></td>
+                <td data-label="Command"><code>nslookup kubernetes.default.svc.cluster.local</code> from a Pod</td>
+                <td data-label="Why">Fastest truth check for cluster DNS.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Node health</strong></td>
+                <td data-label="Command"><code>kubectl get nodes</code></td>
+                <td data-label="Why">The official troubleshooting flow starts here.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Logs checked</strong></td>
+                <td data-label="Command"><code>kubectl logs ...</code>, <code>kubectl logs -p ...</code></td>
+                <td data-label="Why">Current and previous logs solve most workload failures.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Metrics path</strong></td>
+                <td data-label="Command"><code>kubectl top nodes</code></td>
+                <td data-label="Why">If this fails, HPA assumptions may also be wrong.</td>
+              </tr>
+              <tr>
+                <td data-label="Check"><strong>Time control</strong></td>
+                <td data-label="Command">Am I stuck past ~8-10 minutes?</td>
+                <td data-label="Why">Bank easy points first; partial progress beats thrashing.</td>
+              </tr>
+            </tbody>
+          </table>
+          <p>Want to drill these live? Open the <a href="tasks/index.html">hands-on task bank</a>.</p>
         </div>
         <p>Troubleshooting has the highest exam weight for a reason: Kubernetes administration is mostly controlled
           diagnosis under uncertainty. Your first-pass triage should always answer three questions in order: <strong>Is
@@ -1890,6 +2000,26 @@ ls /var/log/pods ; ls /var/log/containers  # on-node log files</code></pre>
               </tr>
             </tbody>
           </table>
+        </div>
+      </section>
+      <section class="section-panel study-section" id="hands-on-task-bank">
+        <h2>Hands-on task bank</h2>
+        <p>Reading builds the mental model; a live terminal builds the speed. The companion
+          <a href="tasks/index.html">task bank</a> holds 50 timed, exam-style tasks with deterministic verification,
+          weighted to the official domains and ordered from foundations to failure drills.</p>
+        <div class="two-col">
+          <div class="mini-card"><b>How it works</b>
+            <p>Each task gives a context, an objective, minimal hints, a verify command with expected output, and a
+              reveal-on-demand solution. A per-task timer keeps you honest.</p>
+          </div>
+          <div class="mini-card"><b>Two lab modes</b>
+            <p>Most tasks run in an API lab (kind/minikube with an add-on bundle). Node and control-plane tasks use a
+              kubeadm VM lab. Each task launches the right environment.</p>
+          </div>
+        </div>
+        <div class="hero-actions">
+          <a href="tasks/index.html">Open the task bank</a>
+          <a class="secondary" href="tasks/README.md">Lab setup guide</a>
         </div>
       </section>
       <section class="section-panel study-section" id="guided-practice-framework-and-gke-notes">

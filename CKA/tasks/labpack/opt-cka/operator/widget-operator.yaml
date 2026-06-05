@@ -1,0 +1,62 @@
+# Minimal operator bundle for CA-07: registers the Widget CRD and runs a
+# controller-manager Deployment that reports Ready. (Stand-in controller image;
+# enough to exercise the install path and CR consumption.)
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operators
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: widgets.demo.sh
+spec:
+  group: demo.sh
+  scope: Namespaced
+  names:
+    plural: widgets
+    singular: widget
+    kind: Widget
+    shortNames:
+      - wid
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                size:
+                  type: integer
+                  minimum: 0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: widget-operator-controller-manager
+  namespace: operators
+  labels:
+    app: widget-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: widget-operator
+  template:
+    metadata:
+      labels:
+        app: widget-operator
+    spec:
+      containers:
+        - name: manager
+          image: registry.k8s.io/nginx:1.29
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80

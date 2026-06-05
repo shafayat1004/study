@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1" name="viewport" />
+  <meta content="light dark" name="color-scheme" />
+  <meta name="theme-color" content="#326ce5" />
+  <meta name="application-name" content="CKA Guide" />
+  <meta name="apple-mobile-web-app-title" content="CKA Tasks" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>CKA Task Bank</title>
+  <link rel="manifest" href="../manifest.webmanifest" />
+  <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
+  <script>
+    try { var t = localStorage.getItem("cka-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) { }
+  </script>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="assets/tasks.css" />
+</head>
+
+<body>
+  <a class="skip-link" href="#content">Skip to main content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
+  <div class="mobile-bar">
+    <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
+    <strong>CKA Task Bank</strong>
+    <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+  </div>
+  <div class="shell">
+    <aside aria-label="Task bank navigation" class="sidebar" id="sidebar">
+      <div class="brand-card">
+        <div class="logo"><span class="kube-mark">K8s</span>
+          <h1>CKA Task Bank</h1>
+        </div>
+        <p>50 timed, verifiable practice tasks. Read, set context, solve, then verify.</p>
+      </div>
+      <div class="controls">
+        <button aria-label="Toggle dark theme" aria-pressed="false" id="themeToggle" type="button">◐ Theme</button>
+        <a class="button" href="../index.html">← Study guide</a>
+      </div>
+      <div class="search-box">
+        <input aria-label="Search tasks" id="search" placeholder="Search tasks..." type="search" />
+      </div>
+
+      <div class="toc-title">Sort</div>
+      <div class="chip-row" id="sortChips" role="group" aria-label="Sort order">
+        <button class="chip active" type="button" data-sort="recommended" aria-pressed="true">Recommended path</button>
+        <button class="chip" type="button" data-sort="id" aria-pressed="false">By ID</button>
+      </div>
+
+      <div class="toc-title">Domain</div>
+      <div class="chip-row" id="domainChips" role="group" aria-label="Filter by domain"></div>
+
+      <div class="toc-title">Lab mode</div>
+      <div class="chip-row" id="labModeChips" role="group" aria-label="Filter by lab mode"></div>
+
+      <div class="toc-title">Difficulty</div>
+      <div class="chip-row" id="difficultyChips" role="group" aria-label="Filter by difficulty"></div>
+
+      <div class="toc-title">Phase</div>
+      <div class="chip-row" id="phaseChips" role="group" aria-label="Filter by phase"></div>
+
+      <button class="reset-filters" id="resetFilters" type="button">Reset filters</button>
+    </aside>
+
+    <main class="main" id="content" tabindex="-1">
+      <header class="hero section-panel" id="task-bank-overview">
+        <p class="eyebrow">Certified Kubernetes Administrator</p>
+        <h1>Hands-on task bank</h1>
+        <p class="subtitle">Fifty timed, exam-style tasks with deterministic verification, weighted to the official
+          domains and grouped by a foundation-to-failure-drills progression. Two lab modes: a kind/minikube API lab and
+          a kubeadm VM lab.</p>
+        <div class="hero-actions">
+          <a href="#task-list">Browse tasks</a>
+          <a class="secondary" href="README.md">Setup guide</a>
+          <a class="secondary" href="../index.html#hands-on-task-bank">Back to guide</a>
+        </div>
+      </header>
+
+      <section class="section-panel" id="exam-quick-check" aria-labelledby="quick-check-title">
+        <h2 id="quick-check-title">Exam quick-check</h2>
+        <p>Before you mark any task done, run the highest-frequency checks. Wrong context, wrong namespace, and
+          unverified output are the easiest ways to lose points.</p>
+        <table class="compact-table">
+          <thead>
+            <tr>
+              <th>Check</th>
+              <th>Fast command or question</th>
+              <th>Why it matters</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td data-label="Check"><strong>Context</strong></td>
+              <td data-label="Command"><code>kubectl config current-context</code></td>
+              <td data-label="Why">Wrong cluster is the easiest way to lose points fast.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Namespace</strong></td>
+              <td data-label="Command"><code>kubectl config view --minify -o jsonpath='{..namespace}'</code></td>
+              <td data-label="Why">A correct object in the wrong namespace is still wrong.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Object exists</strong></td>
+              <td data-label="Command"><code>kubectl get ...</code></td>
+              <td data-label="Why">Do not trust an <code>apply</code> message alone.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Workload healthy</strong></td>
+              <td data-label="Command"><code>kubectl describe ...</code> and <code>kubectl rollout status ...</code></td>
+              <td data-label="Why">Events and rollout state reveal probe, image, and scheduling failures early.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Service path</strong></td>
+              <td data-label="Command"><code>kubectl get svc,endpointslice</code></td>
+              <td data-label="Why">Service issues are usually selector or port issues, not "network magic".</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>DNS works</strong></td>
+              <td data-label="Command"><code>nslookup kubernetes.default.svc.cluster.local</code> from a test Pod</td>
+              <td data-label="Why">Fastest truth check for cluster DNS.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Node health</strong></td>
+              <td data-label="Command"><code>kubectl get nodes</code></td>
+              <td data-label="Why">The official troubleshooting flow starts here.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Logs checked</strong></td>
+              <td data-label="Command"><code>kubectl logs ...</code> and <code>kubectl logs -p ...</code></td>
+              <td data-label="Why">Current and previous logs solve most workload failures.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Metrics path</strong></td>
+              <td data-label="Command"><code>kubectl top nodes</code></td>
+              <td data-label="Why">If this fails, HPA-related assumptions may also be wrong.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Docs discipline</strong></td>
+              <td data-label="Command">Did I stay inside the allowed docs?</td>
+              <td data-label="Why">CKA allows Kubernetes docs/blog, Helm docs, and Gateway API docs only.</td>
+            </tr>
+            <tr>
+              <td data-label="Check"><strong>Time control</strong></td>
+              <td data-label="Command">Am I stuck past ~8-10 minutes?</td>
+              <td data-label="Why">Bank easy points first; partial progress beats thrashing.</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <div class="task-toolbar" id="task-list">
+        <p class="task-count" id="taskCount" aria-live="polite" role="status">Loading tasks...</p>
+      </div>
+      <div class="no-results" id="noResults" role="status" aria-live="polite">No tasks match these filters. Try
+        resetting filters or clearing search.</div>
+      <div class="task-grid" id="taskGrid"></div>
+      <p class="load-error" id="loadError" hidden>Could not load <code>tasks.json</code>. If you opened this file
+        directly, serve the folder over HTTP (for example <code>python -m http.server</code>) so the browser can fetch
+        the task data.</p>
+
+      <p class="footer-note">CKA hands-on task bank · Verify before you move on · Designed around Kubernetes v1.35</p>
+    </main>
+  </div>
+  <script src="assets/tasks.js"></script>
+</body>
+
+</html>
