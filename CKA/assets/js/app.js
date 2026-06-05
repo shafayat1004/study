@@ -1,6 +1,11 @@
 const doc = document.documentElement;
+const scrollStorageKey = `cka-scroll-position:${location.pathname}`;
 const savedTheme = localStorage.getItem("cka-theme");
 if (savedTheme) doc.setAttribute("data-theme", savedTheme);
+
+if ("scrollRestoration" in history && !location.hash) {
+  history.scrollRestoration = "manual";
+}
 
 async function loadSvgDiagrams() {
   const placeholders = [...document.querySelectorAll("[data-svg-src]")];
@@ -30,6 +35,18 @@ async function loadSvgDiagrams() {
 }
 
 const svgLoadPromise = loadSvgDiagrams();
+
+async function restoreLastScrollPosition() {
+  if (location.hash) return;
+
+  const savedY = Number(localStorage.getItem(scrollStorageKey));
+  if (!Number.isFinite(savedY) || savedY <= 0) return;
+
+  await svgLoadPromise;
+  requestAnimationFrame(() => window.scrollTo({ top: savedY, behavior: "auto" }));
+}
+
+restoreLastScrollPosition();
 
 function toggleTheme() {
   const next = doc.getAttribute("data-theme") === "dark" ? "light" : "dark";
@@ -76,10 +93,14 @@ sections.forEach(s => observer.observe(s));
 const progress = document.getElementById("progress");
 const mobileBar = document.querySelector(".mobile-bar");
 let lastScrollY = window.scrollY;
+let scrollSaveTimer;
 document.addEventListener("scroll", () => {
   const y = window.scrollY;
   const max = document.documentElement.scrollHeight - window.innerHeight;
   progress.style.transform = `scaleX(${Math.max(0, Math.min(1, y / max))})`;
+
+  clearTimeout(scrollSaveTimer);
+  scrollSaveTimer = setTimeout(() => localStorage.setItem(scrollStorageKey, String(Math.round(y))), 150);
 
   // Auto-hide the mobile bar on scroll down, reveal it on scroll up.
   if (mobileBar && !document.body.classList.contains("nav-open")) {
@@ -91,6 +112,10 @@ document.addEventListener("scroll", () => {
   }
   lastScrollY = y;
 }, {passive: true});
+
+window.addEventListener("beforeunload", () => {
+  localStorage.setItem(scrollStorageKey, String(Math.round(window.scrollY)));
+});
 
 document.querySelectorAll(".code-wrap").forEach(wrap => {
   const btn = document.createElement("button");
