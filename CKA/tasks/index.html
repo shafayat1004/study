@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 
-<html data-theme="light" lang="en">
+<html lang="en">
 
 <head>
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport" />
   <meta content="light dark" name="color-scheme" />
-  <meta name="theme-color" content="#326ce5" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#0f172a" media="(prefers-color-scheme: dark)" />
   <meta name="application-name" content="CKA Guide" />
   <meta name="apple-mobile-web-app-title" content="CKA Tasks" />
   <meta name="mobile-web-app-capable" content="yes" />
@@ -73,9 +74,6 @@
   <link rel="sitemap" type="application/xml" href="../sitemap.xml" />
   <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="../assets/icons/apple-touch-icon.png" />
-  <script>
-    try { var t = localStorage.getItem("cka-theme"); if (t) document.documentElement.setAttribute("data-theme", t); } catch (e) { }
-  </script>
   <link rel="stylesheet" href="../assets/css/styles.css" />
   <link rel="stylesheet" href="assets/tasks.css" />
 </head>
@@ -85,14 +83,14 @@
   <div class="progress" id="progress" aria-hidden="true"></div>
   <div class="mobile-bar">
     <div class="mobile-bar-row">
-      <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
+      <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button"><span aria-hidden="true">☰</span></button>
       <div class="mobile-bar-center">
         <strong class="mobile-title">CKA Task Bank</strong>
         <input aria-label="Search tasks" class="mobile-search-input" id="searchMobile" placeholder="Search tasks..."
           type="search" />
       </div>
-      <button aria-expanded="false" aria-label="Search tasks" id="searchToggleMobile" type="button">🔍</button>
-      <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+      <button aria-expanded="false" aria-label="Search tasks" id="searchToggleMobile" type="button"><span aria-hidden="true">🔍</span></button>
+      <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button"><span aria-hidden="true">◐</span></button>
     </div>
   </div>
   <div class="shell">
@@ -104,7 +102,7 @@
         <p>50 timed, verifiable practice tasks. Read, set context, solve, then verify.</p>
       </div>
       <div class="controls">
-        <button aria-label="Toggle dark theme" aria-pressed="false" id="themeToggle" type="button">◐ Theme</button>
+        <button aria-label="Toggle dark theme" aria-pressed="false" id="themeToggle" type="button"><span aria-hidden="true">◐</span> Theme</button>
         <a class="button" href="../index.html">← Study guide</a>
       </div>
       <div class="search-box">
@@ -137,11 +135,11 @@
         <div class="search-results-head">
           <p class="search-results-count" id="searchCount" role="status" aria-live="polite"></p>
           <div class="search-nav">
-            <button id="searchPrev" type="button" aria-label="Previous match" title="Previous match">↑</button>
-            <button id="searchNext" type="button" aria-label="Next match" title="Next match">↓</button>
+            <button id="searchPrev" type="button" aria-label="Previous match" title="Previous match"><span aria-hidden="true">↑</span></button>
+            <button id="searchNext" type="button" aria-label="Next match" title="Next match"><span aria-hidden="true">↓</span></button>
             <button id="searchToggleList" type="button" aria-label="Toggle results list" aria-expanded="true"
-              title="Show or hide the results list">≡</button>
-            <button id="searchClear" type="button" aria-label="Clear search" title="Clear search">✕</button>
+              title="Show or hide the results list"><span aria-hidden="true">≡</span></button>
+            <button id="searchClear" type="button" aria-label="Clear search" title="Clear search"><span aria-hidden="true">✕</span></button>
           </div>
         </div>
         <div class="search-results-list" id="searchList"></div>

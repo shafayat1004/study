@@ -1,7 +1,5 @@
 const doc = document.documentElement;
 const scrollStorageKey = `cka-scroll-position:${location.pathname}`;
-const savedTheme = localStorage.getItem("cka-theme");
-if (savedTheme) doc.setAttribute("data-theme", savedTheme);
 
 if ("scrollRestoration" in history && !location.hash) {
   history.scrollRestoration = "manual";
@@ -77,11 +75,31 @@ restoreLastScrollPosition();
 
 const themeButtons = [document.getElementById("themeToggle"), document.getElementById("themeMobile")].filter(Boolean);
 const darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
+// Manual theme choice is session-only; a refresh reverts to the OS setting.
+let themeOverridden = false;
 function effectiveDark() {
   const attr = doc.getAttribute("data-theme");
   if (attr === "dark") return true;
   if (attr === "light") return false;
   return darkMedia.matches;
+}
+const THEME_COLOR = { light: "#ffffff", dark: "#0f172a" };
+// While the user has a manual (session) override, force the iOS status-bar tint
+// with a media-less theme-color meta that wins over the scheme-based ones.
+// Otherwise the scheme-based metas track the OS automatically.
+function updateThemeColor(isDark) {
+  let meta = document.getElementById("themeColorJs");
+  if (themeOverridden) {
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "theme-color");
+      meta.id = "themeColorJs";
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", isDark ? THEME_COLOR.dark : THEME_COLOR.light);
+  } else if (meta) {
+    meta.remove();
+  }
 }
 function syncThemeButtons() {
   const isDark = effectiveDark();
@@ -89,19 +107,20 @@ function syncThemeButtons() {
     button.setAttribute("aria-pressed", String(isDark));
     button.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
   });
+  updateThemeColor(isDark);
 }
 
 function toggleTheme() {
   const next = effectiveDark() ? "light" : "dark";
   doc.setAttribute("data-theme", next);
-  localStorage.setItem("cka-theme", next);
+  themeOverridden = true;
   syncThemeButtons();
 }
 syncThemeButtons();
 themeButtons.forEach((button) => button.addEventListener("click", toggleTheme));
-// Track OS changes only while the user hasn't picked a theme manually.
+// Always follow the OS while the user hasn't toggled this session.
 darkMedia.addEventListener("change", () => {
-  if (!localStorage.getItem("cka-theme")) syncThemeButtons();
+  if (!themeOverridden) syncThemeButtons();
 });
 document.getElementById("printButton").addEventListener("click", async () => {
   await svgLoadPromise;

@@ -1,6 +1,4 @@
 const doc = document.documentElement;
-const savedTheme = localStorage.getItem("cka-theme");
-if (savedTheme) doc.setAttribute("data-theme", savedTheme);
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -315,11 +313,30 @@ document.getElementById("resetFilters").addEventListener("click", () => {
 // Theme toggle
 const themeButtons = [document.getElementById("themeToggle"), document.getElementById("themeMobile")].filter(Boolean);
 const darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
+// Manual theme choice is session-only; a refresh reverts to the OS setting.
+let themeOverridden = false;
 function effectiveDark() {
   const attr = doc.getAttribute("data-theme");
   if (attr === "dark") return true;
   if (attr === "light") return false;
   return darkMedia.matches;
+}
+const THEME_COLOR = { light: "#ffffff", dark: "#0f172a" };
+// While the user has a manual (session) override, force the iOS status-bar tint
+// with a media-less theme-color meta that wins over the scheme-based ones.
+function updateThemeColor(isDark) {
+  let meta = document.getElementById("themeColorJs");
+  if (themeOverridden) {
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "theme-color");
+      meta.id = "themeColorJs";
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute("content", isDark ? THEME_COLOR.dark : THEME_COLOR.light);
+  } else if (meta) {
+    meta.remove();
+  }
 }
 function syncThemeButtons() {
   const isDark = effectiveDark();
@@ -327,17 +344,18 @@ function syncThemeButtons() {
     b.setAttribute("aria-pressed", String(isDark));
     b.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
   });
+  updateThemeColor(isDark);
 }
 function toggleTheme() {
   const next = effectiveDark() ? "light" : "dark";
   doc.setAttribute("data-theme", next);
-  localStorage.setItem("cka-theme", next);
+  themeOverridden = true;
   syncThemeButtons();
 }
 syncThemeButtons();
 themeButtons.forEach((b) => b.addEventListener("click", toggleTheme));
 darkMedia.addEventListener("change", () => {
-  if (!localStorage.getItem("cka-theme")) syncThemeButtons();
+  if (!themeOverridden) syncThemeButtons();
 });
 
 // Mobile nav

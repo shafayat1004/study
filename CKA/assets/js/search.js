@@ -228,10 +228,18 @@ function initGuideSearch(options) {
     if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
   }
 
+  // Update the toggle's icon without clobbering its aria-hidden glyph span.
+  function setToggleIcon(glyph) {
+    if (!searchToggleMobile) return;
+    const icon = searchToggleMobile.querySelector("span");
+    if (icon) icon.textContent = glyph;
+    else searchToggleMobile.textContent = glyph;
+  }
+
   function collapseMobileSearch() {
     if (mobileBarEl) mobileBarEl.classList.remove("searching");
     if (searchToggleMobile) {
-      searchToggleMobile.textContent = "🔍";
+      setToggleIcon("🔍");
       searchToggleMobile.setAttribute("aria-expanded", "false");
       searchToggleMobile.setAttribute("aria-label", mobileSearchLabel);
     }
@@ -283,7 +291,7 @@ function initGuideSearch(options) {
     searchToggleMobile.addEventListener("click", () => {
       const active = mobileBarEl.classList.toggle("searching");
       if (active) {
-        searchToggleMobile.textContent = "✕";
+        setToggleIcon("✕");
         searchToggleMobile.setAttribute("aria-expanded", "true");
         searchToggleMobile.setAttribute("aria-label", "Close search");
         if (mobileSearchInput) mobileSearchInput.focus();
