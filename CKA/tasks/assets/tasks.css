@@ -60,6 +60,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 30rem), 1fr));
   gap: 1.1rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .task-card {
@@ -72,6 +74,15 @@
   flex-direction: column;
   gap: .75rem;
   scroll-margin-top: 1.25rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Let flex/grid children shrink instead of forcing the card wider than the viewport. */
+.task-card > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .task-card.is-done {
@@ -83,6 +94,15 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: .75rem;
+  min-width: 0;
+}
+
+.task-head > div:first-child {
+  min-width: 0;
+}
+
+.done-toggle {
+  flex: 0 0 auto;
 }
 
 .task-id {
@@ -98,6 +118,7 @@
   font-size: 1.18rem;
   line-height: 1.2;
   letter-spacing: -.02em;
+  overflow-wrap: anywhere;
 }
 
 .badges {
@@ -199,6 +220,12 @@
 .task-card details > summary::after { content: "▸"; color: var(--muted); }
 .task-card details[open] > summary::after { content: "▾"; }
 
+.task-card details,
+.task-card details .details-body {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .task-card details .details-body {
   padding: 0 .8rem .8rem;
 }
@@ -229,6 +256,8 @@
   border: 1px solid #1e293b;
   border-radius: 14px;
   overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .cmd-block pre {
@@ -238,7 +267,15 @@
   font-size: .82rem;
   line-height: 1.5;
   overflow-x: auto;
+  overscroll-behavior-inline: contain;
   white-space: pre;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Keep the copy button clear of horizontally scrolling code. */
+.cmd-block pre {
+  padding-right: 3.6rem;
 }
 
 .copy-cmd {
@@ -325,4 +362,15 @@ mark { background: #fef08a; color: #111827; padding: .05rem .15rem; border-radiu
 
 @media (max-width: 860px) {
   .task-grid { grid-template-columns: 1fr; }
+  .task-card { padding: 1rem .9rem 1.05rem; border-radius: 18px; }
+  .task-head { flex-wrap: wrap; }
+  .cmd-block pre { font-size: .78rem; }
+  .timer-clock { font-size: 1.1rem; min-width: 3.8rem; }
+}
+
+@media (max-width: 430px) {
+  .task-card { padding: .85rem .75rem .95rem; }
+  .task-meta { gap: .3rem; }
+  .badge { font-size: .68rem; padding: .18rem .45rem; }
+  .launch-btn { width: 100%; justify-content: center; }
 }
