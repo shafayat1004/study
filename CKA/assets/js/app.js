@@ -81,7 +81,7 @@ sections.forEach((section) => {
   if (!h) return;
   const a = document.createElement("a");
   a.href = "#" + section.id;
-  a.textContent = h.textContent.replace("Comprehensive CKA Study Guide", "Overview");
+  a.textContent = h.textContent.replace("CKA Study Guide", "Overview");
   a.addEventListener("click", () => document.body.classList.remove("nav-open"));
   toc.appendChild(a);
 });

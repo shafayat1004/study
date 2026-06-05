@@ -1,7 +1,7 @@
 {
-  "name": "Comprehensive CKA Study Guide",
+  "name": "CKA Study Guide",
   "short_name": "CKA Guide",
-  "description": "A visual, offline-friendly study guide for the Certified Kubernetes Administrator exam.",
+  "description": "An offline-friendly study guide for the Certified Kubernetes Administrator exam.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
