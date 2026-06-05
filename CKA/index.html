@@ -19,14 +19,15 @@
 </head>
 
 <body>
-  <div class="progress" id="progress"></div>
+  <a class="skip-link" href="#content">Skip to main content</a>
+  <div class="progress" id="progress" aria-hidden="true"></div>
   <div class="mobile-bar">
-    <button aria-label="Open navigation" id="openNav">☰ Menu</button>
+    <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
     <strong>CKA Study Guide</strong>
-    <button aria-label="Toggle theme" id="themeMobile">◐</button>
+    <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
   </div>
   <div class="shell">
-    <aside class="sidebar" id="sidebar">
+    <aside aria-label="Guide navigation" class="sidebar" id="sidebar">
       <div class="brand-card">
         <div class="logo"><span class="kube-mark">K8s</span>
           <h1>CKA Study Guide</h1>
@@ -34,16 +35,16 @@
         <p>Study notes with navigation, search, labs, diagrams, glossary, and references.</p>
       </div>
       <div class="controls">
-        <button id="themeToggle">◐ Theme</button>
+        <button aria-label="Toggle dark theme" aria-pressed="false" id="themeToggle" type="button">◐ Theme</button>
         <button id="printButton" type="button">Print / PDF</button>
       </div>
       <div class="search-box">
         <input aria-label="Search this guide" id="search" placeholder="Search this guide..." type="search" />
       </div>
-      <div class="toc-title">Navigation</div>
-      <nav class="toc" id="toc"></nav>
+      <div class="toc-title" id="tocTitle">Navigation</div>
+      <nav aria-labelledby="tocTitle" class="toc" id="toc"></nav>
     </aside>
-    <main class="main" id="content">
+    <main class="main" id="content" tabindex="-1">
       <div aria-label="CKA exam facts" class="stats">
         <div class="stat"><b>2h</b><span>Performance-based command-line exam</span></div>
         <div class="stat"><b>15–20</b><span>Hands-on tasks</span></div>
@@ -51,7 +52,7 @@
         <div class="stat"><b>25%</b><span>Cluster architecture, install, config</span></div>
         <div class="stat"><b>GKE</b><span>Managed-Kubernetes comparison notes</span></div>
       </div>
-      <div class="no-results" id="noResults">No matching sections found. Try “Service”, “RBAC”, “etcd”, “Gateway”, or
+      <div aria-live="polite" class="no-results" id="noResults" role="status">No matching sections found. Try “Service”, “RBAC”, “etcd”, “Gateway”, or
         “StorageClass”.</div>
       <header class="hero section-panel" id="comprehensive-cka-study-guide">
         <p class="eyebrow">Certified Kubernetes Administrator</p>
