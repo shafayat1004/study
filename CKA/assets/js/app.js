@@ -1,6 +1,36 @@
 const doc = document.documentElement;
 const savedTheme = localStorage.getItem("cka-theme");
 if (savedTheme) doc.setAttribute("data-theme", savedTheme);
+
+async function loadSvgDiagrams() {
+  const placeholders = [...document.querySelectorAll("[data-svg-src]")];
+
+  await Promise.all(placeholders.map(async (placeholder) => {
+    const src = placeholder.dataset.svgSrc;
+
+    try {
+      const response = await fetch(src);
+      if (!response.ok) throw new Error(`Unable to load ${src}`);
+
+      const svgText = await response.text();
+      const parsed = new DOMParser().parseFromString(svgText, "image/svg+xml");
+      const svg = parsed.documentElement;
+
+      if (svg.tagName.toLowerCase() !== "svg") throw new Error("Loaded file is not an SVG");
+
+      placeholder.replaceWith(document.importNode(svg, true));
+    } catch {
+      const img = document.createElement("img");
+      img.className = "diagram";
+      img.src = src;
+      img.alt = placeholder.getAttribute("aria-label") || "Diagram";
+      placeholder.replaceWith(img);
+    }
+  }));
+}
+
+const svgLoadPromise = loadSvgDiagrams();
+
 function toggleTheme() {
   const next = doc.getAttribute("data-theme") === "dark" ? "light" : "dark";
   doc.setAttribute("data-theme", next);
@@ -8,7 +38,10 @@ function toggleTheme() {
 }
 document.getElementById("themeToggle").addEventListener("click", toggleTheme);
 document.getElementById("themeMobile").addEventListener("click", toggleTheme);
-document.getElementById("printButton").addEventListener("click", () => window.print());
+document.getElementById("printButton").addEventListener("click", async () => {
+  await svgLoadPromise;
+  window.print();
+});
 
 const sidebar = document.getElementById("sidebar");
 document.getElementById("openNav").addEventListener("click", () => document.body.classList.add("nav-open"));

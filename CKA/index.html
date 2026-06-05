@@ -87,25 +87,7 @@
 <section class="section-panel study-section" id="cluster-architecture-installation-and-configuration"><h2>Cluster architecture, installation, and configuration</h2>
 <div class="visual-card">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Kubernetes control plane and worker-node responsibilities</strong></div>
-<svg aria-label="Kubernetes cluster architecture diagram" class="diagram" role="img" viewbox="0 0 1120 620">
-<defs><marker id="arrow" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="box plane" height="470" rx="28" width="480" x="40" y="70"></rect><text class="title" x="70" y="112">Control plane</text>
-<rect class="node api" height="76" rx="16" width="180" x="80" y="150"></rect><text class="label" x="103" y="195">kube-apiserver</text>
-<rect class="node etcd" height="76" rx="16" width="160" x="300" y="150"></rect><text class="label" x="355" y="195">etcd</text>
-<rect class="node" height="76" rx="16" width="180" x="80" y="270"></rect><text class="label" x="114" y="315">scheduler</text>
-<rect class="node" height="76" rx="16" width="160" x="300" y="270"></rect><text class="label" x="321" y="315">controllers</text>
-<rect class="node" height="72" rx="16" width="280" x="130" y="400"></rect><text class="label" x="171" y="443">cloud-controller-manager</text>
-<rect class="box worker" height="470" rx="28" width="470" x="610" y="70"></rect><text class="title" x="640" y="112">Worker node</text>
-<rect class="node" height="72" rx="16" width="170" x="650" y="150"></rect><text class="label" x="704" y="193">kubelet</text>
-<rect class="node" height="72" rx="16" width="170" x="870" y="150"></rect><text class="label" x="900" y="193">kube-proxy</text>
-<rect class="node" height="72" rx="16" width="170" x="650" y="270"></rect><text class="label" x="680" y="313">container runtime</text>
-<rect class="node" height="72" rx="16" width="170" x="870" y="270"></rect><text class="label" x="916" y="313">CNI plugin</text>
-<rect class="pod" height="72" rx="16" width="290" x="700" y="400"></rect><text class="label" x="756" y="443">Pods and workloads</text>
-<path class="line" d="M260 188 H300" marker-end="url(#arrow)"></path><path class="line" d="M460 188 C560 178 560 178 650 186" marker-end="url(#arrow)"></path>
-<path class="line" d="M260 310 C420 305 510 260 650 186" marker-end="url(#arrow)"></path><path class="line" d="M735 222 V270" marker-end="url(#arrow)"></path>
-<path class="line" d="M735 342 V400" marker-end="url(#arrow)"></path><path class="line" d="M955 342 C955 365 945 385 910 400" marker-end="url(#arrow)"></path>
-<text class="tiny" x="515" y="178">API-driven reconciliation</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/cluster-architecture.svg" role="img" aria-label="Kubernetes cluster architecture diagram"></div>
 </div>
 <div class="analogy">
 <span class="tag">Analogy</span>
@@ -132,33 +114,7 @@ kubectl config set-context --current --namespace=&lt;namespace&gt;
 kubectl config view --minify</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Two HA control-plane topologies</strong></div>
-<svg aria-label="Stacked etcd versus external etcd HA topologies" class="diagram" role="img" viewbox="0 0 1120 430">
-<defs><marker id="arrowHA" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<text class="title" x="40" y="40">Stacked etcd</text>
-<rect class="gate" height="52" rx="14" width="220" x="120" y="64"></rect><text class="label" x="150" y="97">Load balancer</text>
-<rect class="node" height="118" rx="16" width="200" x="40" y="160"></rect><text class="tiny" x="58" y="184">control-plane 1</text>
-<rect class="node api" height="40" rx="10" width="164" x="58" y="196"></rect><text class="tiny" x="78" y="221">apiserver</text>
-<rect class="node etcd" height="40" rx="10" width="164" x="58" y="240"></rect><text class="tiny" x="98" y="265">etcd</text>
-<rect class="node" height="118" rx="16" width="200" x="270" y="160"></rect><text class="tiny" x="288" y="184">control-plane 2</text>
-<rect class="node api" height="40" rx="10" width="164" x="288" y="196"></rect><text class="tiny" x="308" y="221">apiserver</text>
-<rect class="node etcd" height="40" rx="10" width="164" x="288" y="240"></rect><text class="tiny" x="328" y="265">etcd</text>
-<path class="line" d="M200 116 C160 140 150 150 140 160" marker-end="url(#arrowHA)"></path>
-<path class="line" d="M250 116 C300 140 350 150 370 160" marker-end="url(#arrowHA)"></path>
-<text class="tiny" x="40" y="320">etcd member lives on every control-plane node</text>
-<line stroke="var(--line)" stroke-width="2" x1="560" x2="560" y1="40" y2="380"></line>
-<text class="title" x="620" y="40">External etcd</text>
-<rect class="gate" height="52" rx="14" width="220" x="700" y="64"></rect><text class="label" x="730" y="97">Load balancer</text>
-<rect class="node api" height="70" rx="16" width="180" x="620" y="160"></rect><text class="label" x="648" y="201">apiserver 1</text>
-<rect class="node api" height="70" rx="16" width="180" x="840" y="160"></rect><text class="label" x="868" y="201">apiserver 2</text>
-<rect class="box" height="96" rx="16" width="360" x="640" y="270"></rect><text class="tiny" x="658" y="294">dedicated etcd cluster</text>
-<rect class="node etcd" height="38" rx="10" width="100" x="658" y="306"></rect><text class="tiny" x="690" y="330">etcd</text>
-<rect class="node etcd" height="38" rx="10" width="100" x="770" y="306"></rect><text class="tiny" x="802" y="330">etcd</text>
-<rect class="node etcd" height="38" rx="10" width="100" x="882" y="306"></rect><text class="tiny" x="914" y="330">etcd</text>
-<path class="line" d="M790 116 C740 138 720 150 710 160" marker-end="url(#arrowHA)"></path>
-<path class="line" d="M830 116 C880 138 920 150 930 160" marker-end="url(#arrowHA)"></path>
-<path class="line dashed" d="M710 230 V270" marker-end="url(#arrowHA)"></path>
-<path class="line dashed" d="M930 230 C900 248 850 258 820 270" marker-end="url(#arrowHA)"></path>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/ha-etcd-topologies.svg" role="img" aria-label="Stacked etcd versus external etcd HA topologies"></div>
 <span class="cap">Stacked is cheaper but couples API and etcd failure domains; external etcd separates them at the cost of more machines to operate. Both sit behind one stable load-balanced endpoint.</span>
 </div>
 <p>High availability is a separate design skill, not just “more nodes.” The official kubeadm HA topology guidance describes two main options: <strong>stacked control plane</strong>, where each control-plane node also runs a local etcd member, and <strong>external etcd</strong>, where the control plane nodes and etcd members are separated. Stacked control planes need less infrastructure; external etcd gives stronger separation at the cost of more moving parts. In both cases you need a stable endpoint in front of the control plane—typically a load-balanced endpoint—and when adding additional control-plane nodes, kubeadm can temporarily upload control-plane certificates with <code>--upload-certs</code> and use a <code>--certificate-key</code> during <code>kubeadm join --control-plane</code>.</p><p>Cluster lifecycle management for CKA means you should be able to perform controlled maintenance. The official upgrade guidance is explicit: <strong>skipping minor versions is unsupported</strong> for kubeadm upgrades. <code>kubeadm upgrade</code> checks cluster health, enforces version-skew policies, upgrades control-plane static Pod manifests, updates CoreDNS and kube-proxy manifests where needed, and refreshes expiring certificates as part of the process. During maintenance, <code>kubectl drain</code> safely evicts workloads from a node, and <code>kubectl uncordon</code> returns the node to scheduling service when you are done. If an application requires availability during drains, PodDisruptionBudgets are the native mechanism that constrains voluntary disruption.</p><p>Certificate management is a distinct operational responsibility in kubeadm clusters. kubeadm-generated client certificates expire after one year by default, and kubeadm supports manual renewal through <code>kubeadm certs renew</code>. In replicated control planes, renewal must be handled across all control-plane nodes, and the renewed files must line up with the static Pod manifests and kubeconfigs that consume them. In practice, a surprising amount of “cluster not responding” work ends up being either expired certificates or mismatched certificate material.</p>
@@ -208,25 +164,7 @@ roleRef:
   name: pod-reader</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>How a subject actually gets permissions</strong></div>
-<svg aria-label="RBAC relationship between subjects, bindings, roles, and permissions" class="diagram" role="img" viewbox="0 0 1120 360">
-<defs><marker id="arrowRbac" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<text class="title" x="20" y="40">Namespaced</text>
-<rect class="pod" height="76" rx="16" width="210" x="20" y="62"></rect><text class="label" x="44" y="98">Subject</text><text class="tiny" x="44" y="122">SA / User / Group</text>
-<rect class="ctrl" height="76" rx="16" width="200" x="300" y="62"></rect><text class="label" x="328" y="105">RoleBinding</text>
-<rect class="node" height="76" rx="16" width="170" x="570" y="62"></rect><text class="label" x="620" y="105">Role</text>
-<rect class="node api" height="76" rx="16" width="290" x="810" y="62"></rect><text class="label" x="836" y="98">verbs · resources</text><text class="tiny" x="836" y="122">get, list, watch · pods</text>
-<path class="line" d="M230 100 H300" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M500 100 H570" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M740 100 H810" marker-end="url(#arrowRbac)"></path>
-<text class="title" x="20" y="240">Cluster-wide</text>
-<rect class="pod" height="76" rx="16" width="210" x="20" y="262"></rect><text class="label" x="44" y="298">Subject</text><text class="tiny" x="44" y="322">SA / User / Group</text>
-<rect class="ctrl" height="76" rx="16" width="200" x="300" y="262"></rect><text class="tiny" x="320" y="296">ClusterRole-</text><text class="tiny" x="320" y="318">Binding</text>
-<rect class="node" height="76" rx="16" width="170" x="570" y="262"></rect><text class="label" x="600" y="305">ClusterRole</text>
-<rect class="node api" height="76" rx="16" width="290" x="810" y="262"></rect><text class="label" x="836" y="298">cluster-scoped</text><text class="tiny" x="836" y="322">nodes, PVs, namespaces…</text>
-<path class="line" d="M230 300 H300" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M500 300 H570" marker-end="url(#arrowRbac)"></path>
-<path class="line" d="M740 300 H810" marker-end="url(#arrowRbac)"></path>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/rbac-relationships.svg" role="img" aria-label="RBAC relationship between subjects, bindings, roles, and permissions"></div>
 <span class="cap">Permissions never attach to a subject directly. A binding glues a subject to a Role (namespaced) or ClusterRole (cluster-wide). A RoleBinding may also point at a ClusterRole to reuse one definition across namespaces.</span>
 </div>
 <p>Admission is the final gate before object persistence. Admission controllers are code in the API server that run <strong>after authentication and authorization but before the modified object is persisted</strong>. Several features that matter operationally depend on admission controllers being enabled. For current CKA study, the most directly relevant built-in mechanism is <strong>Pod Security Admission</strong>, which enforces Pod Security Standards at the namespace level using the <code>privileged</code>, <code>baseline</code>, and <code>restricted</code> policy levels. Namespace labels define whether violations are <strong>enforced</strong>, <strong>audited</strong>, or <strong>warned</strong>.</p>
@@ -431,19 +369,7 @@ kubectl rollout undo deploy/web</code></pre></div>
     name: app-secret</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>The three probes on one timeline</strong></div>
-<svg aria-label="Container probe timeline" class="diagram" role="img" viewbox="0 0 1120 280">
-<defs><marker id="arrowProbe" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<text class="title" x="20" y="40">Probe timeline</text>
-<line class="line" x1="80" x2="1080" y1="64" y2="64"></line>
-<circle class="arrow" cx="80" cy="64" r="8"></circle>
-<text class="tiny" x="58" y="48">container starts</text>
-<rect class="ctrl" height="54" rx="12" width="320" x="120" y="92"></rect><text class="label" x="142" y="118">startup probe</text><text class="tiny" x="142" y="138">guards slow boot</text>
-<text class="tiny" x="120" y="168">liveness + readiness held until this passes</text>
-<rect class="repel" height="54" rx="12" width="600" x="470" y="92"></rect><text class="label" x="492" y="118">liveness probe</text><text class="tiny" x="690" y="124">fails → restart container</text>
-<rect class="attract" height="54" rx="12" width="600" x="470" y="180"></rect><text class="label" x="492" y="206">readiness probe</text><text class="tiny" x="690" y="212">fails → drop from Service endpoints</text>
-<path class="line" d="M440 119 H470" marker-end="url(#arrowProbe)"></path>
-<text class="tiny" x="980" y="262">time →</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/probe-timeline.svg" role="img" aria-label="Container probe timeline"></div>
 <span class="cap">Startup buys grace for slow apps; liveness keeps a hung container from lingering; readiness keeps traffic away until the Pod can actually serve.</span>
 </div>
 <div class="analogy">
@@ -475,25 +401,7 @@ spec:
         averageUtilization: 60</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Affinity attracts, taints repel</strong></div>
-<svg aria-label="Affinity attraction versus taint repulsion" class="diagram" role="img" viewbox="0 0 1120 320">
-<defs>
-<marker id="arrowOk" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="ok-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-<marker id="arrowBad" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="bad-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-</defs>
-<text class="title" x="20" y="40">Affinity attracts</text>
-<rect class="pod" height="60" rx="14" width="170" x="60" y="70"></rect><text class="tiny" x="80" y="98">Pod wants</text><text class="tiny" x="80" y="118">disktype=ssd</text>
-<rect class="attract" height="96" rx="16" width="220" x="60" y="190"></rect><text class="label" x="90" y="234">node</text><text class="tiny" x="90" y="258">labelled ssd</text>
-<path class="ok-line" d="M145 130 V190" marker-end="url(#arrowOk)"></path>
-<text class="tiny" x="60" y="306">nodeSelector / nodeAffinity pulls it in</text>
-<line stroke="var(--line)" stroke-width="2" x1="540" x2="540" y1="30" y2="300"></line>
-<text class="title" x="600" y="40">Taints repel</text>
-<rect class="pod" height="60" rx="14" width="160" x="600" y="70"></rect><text class="tiny" x="618" y="98">Pod, no</text><text class="tiny" x="618" y="118">toleration</text>
-<rect class="pod" height="60" rx="14" width="170" x="900" y="70"></rect><text class="tiny" x="918" y="98">Pod with</text><text class="tiny" x="918" y="118">toleration</text>
-<rect class="repel" height="96" rx="16" width="280" x="640" y="190"></rect><text class="label" x="668" y="230">node</text><text class="tiny" x="668" y="254">taint: gpu=true:NoSchedule</text>
-<path class="bad-line dashed" d="M680 130 V190" marker-end="url(#arrowBad)"></path>
-<text class="bad-arrow" font-size="34" font-weight="900" x="700" y="172">✕</text>
-<path class="ok-line" d="M985 130 C940 158 900 168 860 190" marker-end="url(#arrowOk)"></path>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/affinity-taints.svg" role="img" aria-label="Affinity attraction versus taint repulsion"></div>
 <span class="cap">Affinity and <code>nodeSelector</code> draw Pods toward matching nodes. A taint pushes Pods away from a node unless the Pod carries a matching toleration — useful for dedicated GPU, infra, or maintenance nodes.</span>
 </div>
 <div class="analogy">
@@ -588,27 +496,7 @@ kubectl get events -o wide | grep Scheduled</code></pre></div>
 <h3>Deployment strategies and safe rollouts</h3>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Blue-green vs canary</strong></div>
-<svg aria-label="Blue-green and canary deployment strategies" class="diagram" role="img" viewbox="0 0 1120 320">
-<defs>
-<marker id="arrowDep" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-<marker id="arrowDepMute" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z" opacity="0.5"></path></marker>
-</defs>
-<text class="title" x="20" y="40">Blue-green</text>
-<rect class="gate" height="60" rx="14" width="160" x="20" y="120"></rect><text class="label" x="46" y="156">Service</text>
-<rect class="pod" height="60" rx="14" width="180" x="270" y="60"></rect><text class="tiny" x="292" y="88">v1 (blue)</text><text class="tiny" x="292" y="110">live</text>
-<rect class="node" height="60" rx="14" width="180" x="270" y="190"></rect><text class="tiny" x="292" y="218">v2 (green)</text><text class="tiny" x="292" y="240">staged, idle</text>
-<path class="ok-line" d="M180 145 C220 120 240 100 270 90" marker-end="url(#arrowDep)"></path>
-<path class="line dashed" d="M180 155 C220 185 240 200 270 220" marker-end="url(#arrowDepMute)"></path>
-<text class="tiny" x="270" y="285">flip the Service selector to cut over instantly (and roll back just as fast)</text>
-<line stroke="var(--line)" stroke-width="2" x1="560" x2="560" y1="30" y2="300"></line>
-<text class="title" x="600" y="40">Canary</text>
-<rect class="gate" height="60" rx="14" width="160" x="600" y="120"></rect><text class="label" x="626" y="156">Service</text>
-<rect class="pod" height="60" rx="14" width="200" x="850" y="70"></rect><text class="tiny" x="872" y="98">v1 — most Pods</text><text class="tiny" x="872" y="120">90% traffic</text>
-<rect class="ctrl" height="60" rx="14" width="200" x="850" y="190"></rect><text class="tiny" x="872" y="218">v2 — few Pods</text><text class="tiny" x="872" y="240">10% traffic</text>
-<path class="line" d="M760 145 C800 120 820 105 850 100" marker-end="url(#arrowDep)"></path>
-<path class="line" d="M760 155 C800 185 820 205 850 215" marker-end="url(#arrowDep)"></path>
-<text class="tiny" x="600" y="285">one Service, shared label selector; replica ratio sets the traffic split</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/deployment-strategies.svg" role="img" aria-label="Blue-green and canary deployment strategies"></div>
 <span class="cap">Blue-green keeps two full versions and flips the selector. Canary runs a small slice of the new version behind the same Service, controlled by how many replicas each version has.</span>
 </div>
 <table class="compact-table">
@@ -673,53 +561,12 @@ kubectl autoscale deploy/web --min=2 --max=8 --cpu-percent=60</code></pre></div>
 <section class="section-panel study-section" id="services-networking-and-storage"><h2>Services, networking, and storage</h2>
 <div class="visual-card">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Traffic and storage paths you should be able to debug</strong></div>
-<svg aria-label="Kubernetes service networking and storage diagram" class="diagram" role="img" viewbox="0 0 1120 700">
-<defs><marker id="arrow2" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<text class="title" x="60" y="62">North-south traffic</text>
-<rect class="node api" height="70" rx="16" width="160" x="70" y="100"></rect><text class="label" x="111" y="142">Client</text>
-<rect class="node" height="70" rx="16" width="210" x="285" y="100"></rect><text class="label" x="315" y="142">Gateway / Ingress</text>
-<rect class="node" height="70" rx="16" width="170" x="550" y="100"></rect><text class="label" x="604" y="142">Service</text>
-<rect class="node" height="70" rx="16" width="190" x="775" y="100"></rect><text class="label" x="815" y="142">EndpointSlice</text>
-<rect class="pod" height="70" rx="16" width="80" x="1010" y="100"></rect><text class="label" x="1025" y="142">Pod</text>
-<path class="line" d="M230 135 H285" marker-end="url(#arrow2)"></path><path class="line" d="M495 135 H550" marker-end="url(#arrow2)"></path><path class="line" d="M720 135 H775" marker-end="url(#arrow2)"></path><path class="line" d="M965 135 H1010" marker-end="url(#arrow2)"></path>
-<rect class="node etcd" height="70" rx="16" width="170" x="550" y="220"></rect><text class="label" x="584" y="262">CoreDNS</text>
-<path class="line dashed" d="M150 170 C240 245 400 255 550 255" marker-end="url(#arrow2)"></path><text class="tiny" x="234" y="245">name resolution</text>
-<text class="title" x="60" y="385">Persistent storage</text>
-<rect class="node" height="70" rx="16" width="180" x="80" y="430"></rect><text class="label" x="119" y="472">StorageClass</text>
-<rect class="node" height="70" rx="16" width="160" x="325" y="430"></rect><text class="label" x="382" y="472">PVC</text>
-<rect class="node" height="70" rx="16" width="160" x="550" y="430"></rect><text class="label" x="607" y="472">PV</text>
-<rect class="pod" height="70" rx="16" width="180" x="775" y="430"></rect><text class="label" x="831" y="472">Pod</text>
-<rect class="node api" height="70" rx="16" width="220" x="550" y="550"></rect><text class="label" x="614" y="592">CSI driver</text>
-<path class="line" d="M260 465 H325" marker-end="url(#arrow2)"></path><path class="line" d="M485 465 H550" marker-end="url(#arrow2)"></path><path class="line" d="M710 465 H775" marker-end="url(#arrow2)"></path><path class="line" d="M630 500 V550" marker-end="url(#arrow2)"></path>
-<text class="tiny" x="260" y="407">dynamic provisioning + reclaim policy</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/service-networking-storage.svg" role="img" aria-label="Kubernetes service networking and storage diagram"></div>
 </div>
 <p>A <strong>Service</strong> is Kubernetes’ stable way to expose a network application that runs across one or more Pods. The main service types you must know cold are <strong>ClusterIP</strong>, <strong>NodePort</strong>, and <strong>LoadBalancer</strong>. Under the hood, modern Kubernetes uses <strong>EndpointSlices</strong> to represent backend endpoints for Services at scale, and <strong>kube-proxy</strong> watches both Services and EndpointSlices to program the data plane for virtual IP behavior. If a Service exists but traffic still does not flow, your mind should immediately jump to selectors, ports, targetPorts, EndpointSlices, and kube-proxy—not only to the Pod itself.</p>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Service types: who can reach the Pods</strong></div>
-<svg aria-label="Service types comparison" class="diagram" role="img" viewbox="0 0 1120 380">
-<defs><marker id="arrowSvc" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="api node" height="64" rx="14" width="150" x="20" y="60"></rect><text class="tiny" x="44" y="88">external</text><text class="tiny" x="44" y="108">client</text>
-<rect class="gate" height="64" rx="14" width="180" x="210" y="60"></rect><text class="label" x="232" y="90">LoadBalancer</text><text class="tiny" x="232" y="110">cloud external IP</text>
-<rect class="gate" height="64" rx="14" width="180" x="430" y="60"></rect><text class="label" x="452" y="90">NodePort</text><text class="tiny" x="452" y="110">NodeIP:30000-32767</text>
-<rect class="gate" height="64" rx="14" width="170" x="650" y="60"></rect><text class="label" x="672" y="90">ClusterIP</text><text class="tiny" x="672" y="110">virtual IP (default)</text>
-<rect class="pod" height="64" rx="14" width="190" x="860" y="60"></rect><text class="label" x="900" y="98">Pods</text>
-<path class="line" d="M170 92 H210" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M390 92 H430" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M610 92 H650" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M820 92 H860" marker-end="url(#arrowSvc)"></path>
-<text class="tiny" x="210" y="150">each type builds on the one to its right</text>
-<line stroke="var(--line)" stroke-width="2" x1="20" x2="1100" y1="200" y2="200"></line>
-<text class="title" x="20" y="244">Headless (clusterIP: None)</text>
-<rect class="node" height="70" rx="14" width="230" x="20" y="266"></rect><text class="tiny" x="42" y="296">DNS query for</text><text class="tiny" x="42" y="318">the Service name</text>
-<rect class="ctrl" height="70" rx="14" width="160" x="300" y="266"></rect><text class="label" x="328" y="308">CoreDNS</text>
-<rect class="pod" height="70" rx="14" width="170" x="540" y="266"></rect><text class="tiny" x="560" y="296">Pod A IP</text>
-<rect class="pod" height="70" rx="14" width="170" x="760" y="266"></rect><text class="tiny" x="780" y="296">Pod B IP</text>
-<path class="line" d="M250 301 H300" marker-end="url(#arrowSvc)"></path>
-<path class="line" d="M460 301 H540" marker-end="url(#arrowSvc)"></path>
-<path class="line dashed" d="M620 336 C660 360 720 360 760 336" marker-end="url(#arrowSvc)"></path>
-<text class="tiny" x="540" y="360">no VIP — DNS returns Pod IPs directly</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/service-types.svg" role="img" aria-label="Service types comparison"></div>
 <span class="cap">ClusterIP is internal-only; NodePort adds a port on every node; LoadBalancer adds a cloud LB in front. A headless Service skips the virtual IP entirely and hands clients the Pod IPs through DNS — the pattern StatefulSets rely on.</span>
 </div>
 <div class="analogy">
@@ -779,28 +626,7 @@ spec:
       port: 8080</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>NetworkPolicy: the OR vs AND trap</strong></div>
-<svg aria-label="NetworkPolicy OR versus AND selector behaviour" class="diagram" role="img" viewbox="0 0 1120 360">
-<defs>
-<marker id="arrowNpOk" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="ok-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-<marker id="arrowNpBad" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="bad-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-</defs>
-<text class="title" x="20" y="40">Separate "-" items = OR</text>
-<rect class="node" height="54" rx="12" width="220" x="20" y="64"></rect><text class="tiny" x="40" y="88">namespaceSelector</text><text class="tiny" x="40" y="108">team: payments</text>
-<rect class="node" height="54" rx="12" width="220" x="20" y="140"></rect><text class="tiny" x="40" y="164">podSelector</text><text class="tiny" x="40" y="184">app: api</text>
-<rect class="attract" height="80" rx="16" width="170" x="330" y="92"></rect><text class="label" x="356" y="130">backend</text><text class="tiny" x="356" y="152">target Pod</text>
-<path class="ok-line" d="M240 91 C290 100 300 120 330 128" marker-end="url(#arrowNpOk)"></path>
-<path class="ok-line" d="M240 167 C290 158 300 142 330 134" marker-end="url(#arrowNpOk)"></path>
-<text class="tiny" x="20" y="232">either source is allowed on its own</text>
-<line stroke="var(--line)" stroke-width="2" x1="560" x2="560" y1="30" y2="330"></line>
-<text class="title" x="600" y="40">Same "-" item = AND</text>
-<rect class="node" height="80" rx="12" width="250" x="600" y="64"></rect><text class="tiny" x="620" y="92">namespaceSelector: payments</text><text class="tiny" x="620" y="116">+ podSelector: app=api</text><text class="tiny" x="620" y="138">(both, together)</text>
-<rect class="attract" height="80" rx="16" width="170" x="910" y="74"></rect><text class="label" x="936" y="112">backend</text>
-<path class="ok-line" d="M850 104 C885 110 895 110 910 112" marker-end="url(#arrowNpOk)"></path>
-<rect class="repel" height="50" rx="12" width="250" x="600" y="200"></rect><text class="tiny" x="620" y="230">right ns but wrong Pod label</text>
-<path class="bad-line" d="M850 225 H905" marker-end="url(#arrowNpBad)"></path>
-<text class="bad-arrow" font-size="26" font-weight="900" x="864" y="214">✕</text>
-<text class="tiny" x="600" y="300">a source must satisfy both selectors at once</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/network-policy-selectors.svg" role="img" aria-label="NetworkPolicy OR versus AND selector behaviour"></div>
 <span class="cap">Whether <code>namespaceSelector</code> and <code>podSelector</code> are two list entries (OR) or one combined entry (AND) completely changes what traffic is allowed. This is one of the most common "my policy looks right but blocks everything" bugs.</span>
 </div>
 <p>Storage on the CKA is mostly about durable lifecycle, provisioning behavior, and claims matching. A <strong>PersistentVolume</strong> is storage that exists as a cluster resource, either provisioned manually or dynamically. A <strong>PersistentVolumeClaim</strong> is a user request for storage. A <strong>StorageClass</strong> describes a class of storage and supplies the parameters used for dynamic provisioning. Dynamic provisioning creates storage on demand when a claim asks for a StorageClass; without it, administrators must pre-provision PVs. This PV/PVC/StorageClass triad is foundational for nearly every stateful workload pattern in Kubernetes.</p><p>Claims request size and <strong>access modes</strong> such as <code>ReadWriteOnce</code>, <code>ReadOnlyMany</code>, <code>ReadWriteMany</code>, and <code>ReadWriteOncePod</code>. Access modes are used for matching claims and volumes, and in some cases they also constrain mount behavior. Reclaim policy then decides what happens when the claim is released. For dynamically provisioned volumes, the default reclaim policy is often <strong>Delete</strong>, but <strong>Retain</strong> is frequently the safer choice for valuable data because it preserves the underlying volume for manual recovery after claim deletion.</p><p>A minimal StorageClass and PVC pair:</p><div class="code-wrap" data-copyable="true"><div class="code-label">yaml</div><pre><code>apiVersion: storage.k8s.io/v1
@@ -824,24 +650,7 @@ spec:
       storage: 5Gi</code></pre></div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>PVC binding and what reclaim policy decides</strong></div>
-<svg aria-label="PV PVC StorageClass binding and reclaim policy" class="diagram" role="img" viewbox="0 0 1120 360">
-<defs><marker id="arrowPv" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="ctrl" height="70" rx="16" width="200" x="20" y="40"></rect><text class="label" x="46" y="76">StorageClass</text><text class="tiny" x="46" y="98">provisioner + params</text>
-<rect class="node" height="70" rx="16" width="160" x="300" y="40"></rect><text class="label" x="338" y="80">PV</text>
-<rect class="node" height="70" rx="16" width="160" x="540" y="40"></rect><text class="label" x="572" y="80">PVC</text>
-<rect class="pod" height="70" rx="16" width="160" x="780" y="40"></rect><text class="label" x="826" y="80">Pod</text>
-<path class="line" d="M220 75 H300" marker-end="url(#arrowPv)"></path><text class="tiny" x="222" y="34">dynamic provision</text>
-<path class="ok-line" d="M460 75 H540" marker-end="url(#arrowPv)"></path><text class="tiny" x="468" y="34">bound</text>
-<path class="line" d="M700 75 H780" marker-end="url(#arrowPv)"></path><text class="tiny" x="706" y="34">mounts</text>
-<text class="title" x="20" y="190">When the PVC is deleted…</text>
-<rect class="repel" height="70" rx="16" width="200" x="20" y="210"></rect><text class="tiny" x="40" y="240">PVC deleted</text><text class="tiny" x="40" y="262">PV → Released</text>
-<rect class="attract" height="70" rx="16" width="260" x="320" y="180"></rect><text class="label" x="346" y="216">Retain</text><text class="tiny" x="346" y="240">PV + data kept for manual recovery</text>
-<rect class="repel" height="70" rx="16" width="260" x="320" y="270"></rect><text class="label" x="346" y="306">Delete</text><text class="tiny" x="346" y="330">PV and backing volume destroyed</text>
-<path class="ok-line" d="M220 235 C270 220 280 215 320 213" marker-end="url(#arrowPv)"></path>
-<path class="bad-line" d="M220 250 C270 270 280 290 320 300" marker-end="url(#arrowPv)"></path>
-<text class="tiny" x="640" y="220">choose Retain for valuable data;</text>
-<text class="tiny" x="640" y="244">dynamic volumes often default to Delete</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/storage-binding-reclaim.svg" role="img" aria-label="PV PVC StorageClass binding and reclaim policy"></div>
 <span class="cap">A PVC binds to a PV (often auto-created by a StorageClass). <code>volumeBindingMode: WaitForFirstConsumer</code> delays provisioning until a Pod is scheduled so zonal storage lands in the right zone. The reclaim policy decides the volume's fate after the claim is gone.</span>
 </div>
 <div class="analogy">
@@ -922,20 +731,7 @@ volumeBindingMode: WaitForFirstConsumer</code></pre></div>
 <h3>The cluster networking model and kube-proxy</h3>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>One flat Pod network, plus a virtual Service network</strong></div>
-<svg aria-label="Kubernetes pod networking model" class="diagram" role="img" viewbox="0 0 1120 340">
-<defs><marker id="arrowNet" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
-<rect class="box" height="190" rx="20" width="420" x="40" y="60"></rect><text class="tiny" x="64" y="92">node-1 · podCIDR 10.244.1.0/24</text>
-<rect class="pod" height="54" rx="12" width="170" x="64" y="120"></rect><text class="tiny" x="84" y="152">pod 10.244.1.2</text>
-<rect class="pod" height="54" rx="12" width="170" x="254" y="120"></rect><text class="tiny" x="274" y="152">pod 10.244.1.3</text>
-<text class="tiny" x="64" y="220">CNI plugin assigns IPs &amp; wires the network</text>
-<rect class="box" height="190" rx="20" width="420" x="660" y="60"></rect><text class="tiny" x="684" y="92">node-2 · podCIDR 10.244.2.0/24</text>
-<rect class="pod" height="54" rx="12" width="170" x="684" y="120"></rect><text class="tiny" x="704" y="152">pod 10.244.2.2</text>
-<rect class="pod" height="54" rx="12" width="170" x="874" y="120"></rect><text class="tiny" x="894" y="152">pod 10.244.2.4</text>
-<text class="tiny" x="684" y="220">CNI plugin assigns IPs &amp; wires the network</text>
-<path class="line" d="M460 147 H660" marker-end="url(#arrowNet)"></path><path class="line" d="M660 165 H460" marker-end="url(#arrowNet)"></path>
-<text class="tiny" x="476" y="138">flat L3: any Pod IP reaches any Pod IP, no NAT</text>
-<rect class="ctrl" height="50" rx="14" width="420" x="360" y="280"></rect><text class="label" x="384" y="305">Service CIDR 10.96.0.0/12 — virtual</text><text class="tiny" x="384" y="324">kube-proxy maps it to Pod IPs (iptables or IPVS)</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/pod-networking-model.svg" role="img" aria-label="Kubernetes pod networking model"></div>
 <span class="cap">Every Pod gets a real, unique IP from its node's Pod CIDR, and the CNI plugin makes the whole thing one flat network. Service IPs are virtual — they exist only as rules programmed by kube-proxy.</span>
 </div>
 <div class="analogy">
@@ -1043,29 +839,7 @@ volumeMounts:
 </div>
 <div class="svg-figure">
 <div class="visual-header"><span class="pill">Illustration</span><strong>Symptom-to-layer decision tree</strong></div>
-<svg aria-label="Troubleshooting decision tree from symptom to layer" class="diagram" role="img" viewbox="0 0 1120 510">
-<defs>
-<marker id="arrowTrOk" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-<marker id="arrowTrNo" markerheight="10" markerwidth="10" orient="auto" refx="8" refy="3"><path class="bad-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
-</defs>
-<rect class="gate" height="64" rx="14" width="380" x="40" y="20"></rect><text class="label" x="64" y="48">All nodes Ready?</text><text class="tiny" x="64" y="70">kubectl get nodes</text>
-<rect class="repel" height="64" rx="14" width="500" x="580" y="20"></rect><text class="tiny" x="600" y="48">NODE: journalctl -u kubelet · crictl · /etc/cni/net.d · certs</text><text class="tiny" x="600" y="70">DiskPressure / Ready=Unknown clues live here</text>
-<rect class="gate" height="64" rx="14" width="380" x="40" y="130"></rect><text class="label" x="64" y="158">Pod Running &amp; Ready?</text><text class="tiny" x="64" y="180">kubectl describe pod · events</text>
-<rect class="repel" height="64" rx="14" width="500" x="580" y="130"></rect><text class="tiny" x="600" y="158">WORKLOAD: image pull · probes · config · requests/limits</text><text class="tiny" x="600" y="180">CrashLoopBackOff → kubectl logs -p</text>
-<rect class="gate" height="64" rx="14" width="380" x="40" y="240"></rect><text class="label" x="64" y="268">Service has endpoints?</text><text class="tiny" x="64" y="290">kubectl get endpointslices</text>
-<rect class="repel" height="64" rx="14" width="500" x="580" y="240"></rect><text class="tiny" x="600" y="268">NETWORK: selector vs labels · port/targetPort · kube-proxy</text><text class="tiny" x="600" y="290">empty endpoints = selector mismatch</text>
-<rect class="gate" height="64" rx="14" width="380" x="40" y="350"></rect><text class="label" x="64" y="378">Name resolves?</text><text class="tiny" x="64" y="400">nslookup svc.ns.svc.cluster.local</text>
-<rect class="repel" height="64" rx="14" width="500" x="580" y="350"></rect><text class="tiny" x="600" y="378">DNS: CoreDNS pods/logs · kube-dns svc · RBAC in kube-system</text>
-<rect class="attract" height="60" rx="14" width="380" x="40" y="450"></rect><text class="label" x="64" y="478">APPLICATION logic / app logs</text>
-<path class="line" d="M230 84 V130" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="114">yes</text>
-<path class="line" d="M230 194 V240" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="224">yes</text>
-<path class="line" d="M230 304 V350" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="334">yes</text>
-<path class="line" d="M230 414 V450" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="440">yes</text>
-<path class="bad-line" d="M420 52 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="42">no</text>
-<path class="bad-line" d="M420 162 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="152">no</text>
-<path class="bad-line" d="M420 272 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="262">no</text>
-<path class="bad-line" d="M420 382 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="372">no</text>
-</svg>
+<div class="diagram svg-placeholder" data-svg-src="assets/svg/troubleshooting-decision-tree.svg" role="img" aria-label="Troubleshooting decision tree from symptom to layer"></div>
 <span class="cap">Always triage top-down: cluster, then workload, then network, then DNS, then app. Each "no" tells you which layer to open — so you never debug an app symptom that is really a dead node.</span>
 </div>
 <div class="analogy">

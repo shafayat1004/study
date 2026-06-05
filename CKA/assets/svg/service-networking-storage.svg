@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Kubernetes service networking and storage diagram" class="diagram" role="img" viewBox="0 0 1120 700">
+<style><![CDATA[
+.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
+.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
+.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
+.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
+.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
+.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
+.dashed { stroke-dasharray: 8 8; }
+.arrow { fill: var(--muted, #64748b); }
+.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
+.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
+.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
+.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
+.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
+.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
+.ok-arrow { fill: var(--good, #22c55e); }
+.bad-arrow { fill: var(--warn, #f59e0b); }
+.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
+.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
+]]></style>
+<defs><marker id="arrow2" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker></defs>
+<text class="title" x="60" y="62">North-south traffic</text>
+<rect class="node api" height="70" rx="16" width="160" x="70" y="100"></rect><text class="label" x="111" y="142">Client</text>
+<rect class="node" height="70" rx="16" width="210" x="285" y="100"></rect><text class="label" x="315" y="142">Gateway / Ingress</text>
+<rect class="node" height="70" rx="16" width="170" x="550" y="100"></rect><text class="label" x="604" y="142">Service</text>
+<rect class="node" height="70" rx="16" width="190" x="775" y="100"></rect><text class="label" x="815" y="142">EndpointSlice</text>
+<rect class="pod" height="70" rx="16" width="80" x="1010" y="100"></rect><text class="label" x="1025" y="142">Pod</text>
+<path class="line" d="M230 135 H285" marker-end="url(#arrow2)"></path><path class="line" d="M495 135 H550" marker-end="url(#arrow2)"></path><path class="line" d="M720 135 H775" marker-end="url(#arrow2)"></path><path class="line" d="M965 135 H1010" marker-end="url(#arrow2)"></path>
+<rect class="node etcd" height="70" rx="16" width="170" x="550" y="220"></rect><text class="label" x="584" y="262">CoreDNS</text>
+<path class="line dashed" d="M150 170 C240 245 400 255 550 255" marker-end="url(#arrow2)"></path><text class="tiny" x="234" y="245">name resolution</text>
+<text class="title" x="60" y="385">Persistent storage</text>
+<rect class="node" height="70" rx="16" width="180" x="80" y="430"></rect><text class="label" x="119" y="472">StorageClass</text>
+<rect class="node" height="70" rx="16" width="160" x="325" y="430"></rect><text class="label" x="382" y="472">PVC</text>
+<rect class="node" height="70" rx="16" width="160" x="550" y="430"></rect><text class="label" x="607" y="472">PV</text>
+<rect class="pod" height="70" rx="16" width="180" x="775" y="430"></rect><text class="label" x="831" y="472">Pod</text>
+<rect class="node api" height="70" rx="16" width="220" x="550" y="550"></rect><text class="label" x="614" y="592">CSI driver</text>
+<path class="line" d="M260 465 H325" marker-end="url(#arrow2)"></path><path class="line" d="M485 465 H550" marker-end="url(#arrow2)"></path><path class="line" d="M710 465 H775" marker-end="url(#arrow2)"></path><path class="line" d="M630 500 V550" marker-end="url(#arrow2)"></path>
+<text class="tiny" x="260" y="407">dynamic provisioning + reclaim policy</text>
+</svg>

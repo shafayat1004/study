@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" aria-label="Troubleshooting decision tree from symptom to layer" class="diagram" role="img" viewBox="0 0 1120 510">
+<style><![CDATA[
+.box { fill: color-mix(in srgb, var(--accent, #326ce5) 7%, transparent); stroke: var(--line, #d9e2ef); stroke-width: 2; }
+.worker { fill: color-mix(in srgb, var(--accent-2, #14b8a6) 7%, transparent); }
+.node { fill: var(--paper-solid, #ffffff); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
+.api { fill: color-mix(in srgb, var(--accent, #326ce5) 16%, var(--paper-solid, #ffffff)); }
+.etcd { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); }
+.pod { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.line { fill: none; stroke: var(--muted, #64748b); stroke-width: 3; }
+.dashed { stroke-dasharray: 8 8; }
+.arrow { fill: var(--muted, #64748b); }
+.title { fill: var(--ink, #111827); font-size: 28px; font-weight: 900; }
+.label { fill: var(--ink, #111827); font-size: 20px; font-weight: 800; }
+.tiny { fill: var(--muted, #64748b); font-size: 16px; font-weight: 700; }
+.attract { fill: color-mix(in srgb, var(--good, #22c55e) 16%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--good, #22c55e) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.repel { fill: color-mix(in srgb, var(--warn, #f59e0b) 18%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--warn, #f59e0b) 55%, var(--line, #d9e2ef)); stroke-width: 2; }
+.ctrl { fill: color-mix(in srgb, var(--accent-3, #8b5cf6) 15%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent-3, #8b5cf6) 50%, var(--line, #d9e2ef)); stroke-width: 2; }
+.ok-line { fill: none; stroke: var(--good, #22c55e); stroke-width: 3; }
+.bad-line { fill: none; stroke: var(--warn, #f59e0b); stroke-width: 3; }
+.ok-arrow { fill: var(--good, #22c55e); }
+.bad-arrow { fill: var(--warn, #f59e0b); }
+.gate { fill: color-mix(in srgb, var(--accent, #326ce5) 12%, var(--paper-solid, #ffffff)); stroke: color-mix(in srgb, var(--accent, #326ce5) 45%, var(--line, #d9e2ef)); stroke-width: 2; }
+.divider { stroke: var(--line, #d9e2ef); stroke-width: 2; }
+]]></style>
+<defs>
+<marker id="arrowTrOk" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
+<marker id="arrowTrNo" markerHeight="10" markerWidth="10" orient="auto" refX="8" refY="3"><path class="bad-arrow" d="M0,0 L0,6 L9,3 z"></path></marker>
+</defs>
+<rect class="gate" height="64" rx="14" width="380" x="40" y="20"></rect><text class="label" x="64" y="48">All nodes Ready?</text><text class="tiny" x="64" y="70">kubectl get nodes</text>
+<rect class="repel" height="64" rx="14" width="500" x="580" y="20"></rect><text class="tiny" x="600" y="48">NODE: journalctl -u kubelet · crictl · /etc/cni/net.d · certs</text><text class="tiny" x="600" y="70">DiskPressure / Ready=Unknown clues live here</text>
+<rect class="gate" height="64" rx="14" width="380" x="40" y="130"></rect><text class="label" x="64" y="158">Pod Running &amp; Ready?</text><text class="tiny" x="64" y="180">kubectl describe pod · events</text>
+<rect class="repel" height="64" rx="14" width="500" x="580" y="130"></rect><text class="tiny" x="600" y="158">WORKLOAD: image pull · probes · config · requests/limits</text><text class="tiny" x="600" y="180">CrashLoopBackOff → kubectl logs -p</text>
+<rect class="gate" height="64" rx="14" width="380" x="40" y="240"></rect><text class="label" x="64" y="268">Service has endpoints?</text><text class="tiny" x="64" y="290">kubectl get endpointslices</text>
+<rect class="repel" height="64" rx="14" width="500" x="580" y="240"></rect><text class="tiny" x="600" y="268">NETWORK: selector vs labels · port/targetPort · kube-proxy</text><text class="tiny" x="600" y="290">empty endpoints = selector mismatch</text>
+<rect class="gate" height="64" rx="14" width="380" x="40" y="350"></rect><text class="label" x="64" y="378">Name resolves?</text><text class="tiny" x="64" y="400">nslookup svc.ns.svc.cluster.local</text>
+<rect class="repel" height="64" rx="14" width="500" x="580" y="350"></rect><text class="tiny" x="600" y="378">DNS: CoreDNS pods/logs · kube-dns svc · RBAC in kube-system</text>
+<rect class="attract" height="60" rx="14" width="380" x="40" y="450"></rect><text class="label" x="64" y="478">APPLICATION logic / app logs</text>
+<path class="line" d="M230 84 V130" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="114">yes</text>
+<path class="line" d="M230 194 V240" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="224">yes</text>
+<path class="line" d="M230 304 V350" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="334">yes</text>
+<path class="line" d="M230 414 V450" marker-end="url(#arrowTrOk)"></path><text class="tiny" x="240" y="440">yes</text>
+<path class="bad-line" d="M420 52 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="42">no</text>
+<path class="bad-line" d="M420 162 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="152">no</text>
+<path class="bad-line" d="M420 272 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="262">no</text>
+<path class="bad-line" d="M420 382 H580" marker-end="url(#arrowTrNo)"></path><text class="bad-arrow tiny" x="470" y="372">no</text>
+</svg>

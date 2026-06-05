@@ -61,6 +61,7 @@ pre { margin: 0; overflow-x: auto; padding: 1.1rem; color: var(--code-ink); font
 .visual-card { border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent), var(--paper-solid); padding: 1rem; margin: 1.15rem 0 1.25rem; overflow: hidden; }
 .visual-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .75rem; } .visual-header strong { font-size: 1rem; }
 .diagram { width: 100%; height: auto; display: block; }
+.svg-placeholder { min-height: 12rem; display: grid; place-items: center; border: 1px dashed var(--line); border-radius: 18px; color: var(--muted); background: var(--paper-solid); }
 .box { fill: color-mix(in srgb, var(--accent) 7%, transparent); stroke: var(--line); stroke-width: 2; } .worker { fill: color-mix(in srgb, var(--accent-2) 7%, transparent); }
 .node { fill: var(--paper-solid); stroke: color-mix(in srgb, var(--accent) 45%, var(--line)); stroke-width: 2; }
 .api { fill: color-mix(in srgb, var(--accent) 16%, var(--paper-solid)); } .etcd { fill: color-mix(in srgb, var(--warn) 18%, var(--paper-solid)); }
