@@ -7,6 +7,12 @@ if ("scrollRestoration" in history && !location.hash) {
   history.scrollRestoration = "manual";
 }
 
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
+  });
+}
+
 async function loadSvgDiagrams() {
   const placeholders = [...document.querySelectorAll("[data-svg-src]")];
 
