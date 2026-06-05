@@ -1,10 +1,11 @@
-const CACHE_NAME = "cka-guide-v7";
+const CACHE_NAME = "cka-guide-v12";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./assets/favicon.svg",
   "./assets/css/styles.css",
+  "./assets/js/search.js",
   "./assets/js/app.js",
   "./tasks/index.html",
   "./tasks/tasks.json",

@@ -1,12 +1,23 @@
 :root {
+  color-scheme: light;
   --bg: #eef3fb; --bg-2: #f8fafc; --paper: rgba(255,255,255,.92); --paper-solid: #ffffff;
   --ink: #111827; --muted: #64748b; --line: #d9e2ef; --accent: #326ce5; --accent-2: #14b8a6;
   --accent-3: #8b5cf6; --warn: #f59e0b; --good: #22c55e; --code-bg: #0f172a; --code-ink: #e5e7eb;
   --shadow: 0 20px 60px rgba(15,23,42,.10); --radius: 24px; --sidebar: 340px; --max: 1720px;
 }
 [data-theme="dark"] {
+  color-scheme: dark;
   --bg: #08111f; --bg-2: #0b1220; --paper: rgba(15,23,42,.84); --paper-solid: #0f172a;
   --ink: #e5e7eb; --muted: #a5b4c7; --line: #23324a; --code-bg: #020617; --shadow: 0 20px 60px rgba(0,0,0,.35);
+}
+[data-theme="light"] { color-scheme: light; }
+/* Follow the OS colour scheme by default; an explicit data-theme always wins. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #08111f; --bg-2: #0b1220; --paper: rgba(15,23,42,.84); --paper-solid: #0f172a;
+    --ink: #e5e7eb; --muted: #a5b4c7; --line: #23324a; --code-bg: #020617; --shadow: 0 20px 60px rgba(0,0,0,.35);
+  }
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
@@ -67,7 +78,7 @@ a { color: var(--accent); text-decoration: none; } a:hover { text-decoration: un
 button, .button { border: 1px solid var(--line); background: var(--paper-solid); color: var(--ink); border-radius: 14px; padding: .7rem .8rem; font-weight: 700; cursor: pointer; font-size: .88rem; }
 button:hover, .button:hover { border-color: var(--accent); text-decoration: none; }
 .search-box { position: relative; margin: 1rem 0; }
-.search-box input { width: 100%; border: 1px solid var(--line); border-radius: 16px; padding: .9rem 1rem; background: var(--paper-solid); color: var(--ink); outline: none; font-size: .95rem; }
+.search-box input { width: 100%; border: 1px solid var(--line); border-radius: 16px; padding: .9rem 1rem; background: var(--paper-solid); color: var(--ink); outline: none; font-size: 16px; }
 .toc-title { font-size: .74rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); font-weight: 900; margin: 1.1rem .35rem .5rem; }
 .toc { display: grid; gap: .18rem; }
 .toc a { display: block; border-radius: 13px; padding: .65rem .75rem; color: var(--ink); font-size: .92rem; line-height: 1.25; }
@@ -1073,7 +1084,7 @@ code {
   padding: .5rem .7rem;
   background: var(--paper-solid);
   color: var(--ink);
-  font-size: .95rem;
+  font-size: 16px;
   outline: none;
 }
 .mobile-search-input:focus-visible {
@@ -1196,35 +1207,24 @@ mark.search-hit.active {
   border-radius: .2rem;
 }
 
-/* Full-screen spotlight that converges onto the active keyword. */
-.search-spotlight {
-  display: none;
-  position: fixed;
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  opacity: 0;
-  z-index: 1000;
-  box-shadow: 0 0 0 9999px rgba(2, 6, 23, .55), 0 0 36px 10px color-mix(in srgb, var(--warn) 55%, transparent) inset;
+/* Small glow pulse around the active keyword when you jump to it. */
+@keyframes search-hit-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent); }
+  30% { box-shadow: 0 0 0 .45em color-mix(in srgb, var(--warn) 55%, transparent), 0 0 .7em .25em color-mix(in srgb, var(--warn) 60%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent); }
 }
-.search-spotlight.run {
-  display: block;
-  animation: search-spotlight-converge 1.3s cubic-bezier(.2, .7, .2, 1) 1;
-}
-@keyframes search-spotlight-converge {
-  0% { width: 260vmax; height: 260vmax; opacity: 0; }
-  18% { opacity: 1; }
-  55% { width: 140px; height: 140px; opacity: 1; }
-  80% { width: 140px; height: 140px; opacity: 1; }
-  100% { width: 140px; height: 140px; opacity: 0; }
+mark.search-hit.flash {
+  animation: search-hit-pulse 1s ease-out 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  .search-spotlight.run { animation: none; display: none; }
+  mark.search-hit.flash { animation: none; }
 }
 
 @media (max-width: 860px) {
+  /* Hide the sidebar search only where the top-bar search exists (the guide). */
+  body:has(.mobile-search-input) .sidebar .search-box {
+    display: none;
+  }
   .search-results {
     margin: .5rem 0 0;
     max-height: 60vh;

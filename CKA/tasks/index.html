@@ -26,9 +26,16 @@
   <a class="skip-link" href="#content">Skip to main content</a>
   <div class="progress" id="progress" aria-hidden="true"></div>
   <div class="mobile-bar">
-    <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
-    <strong>CKA Task Bank</strong>
-    <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+    <div class="mobile-bar-row">
+      <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
+      <div class="mobile-bar-center">
+        <strong class="mobile-title">CKA Task Bank</strong>
+        <input aria-label="Search tasks" class="mobile-search-input" id="searchMobile" placeholder="Search tasks..."
+          type="search" />
+      </div>
+      <button aria-expanded="false" aria-label="Search tasks" id="searchToggleMobile" type="button">🔍</button>
+      <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+    </div>
   </div>
   <div class="shell">
     <aside aria-label="Task bank navigation" class="sidebar" id="sidebar">
@@ -68,6 +75,19 @@
     </aside>
 
     <main class="main" id="content" tabindex="-1">
+      <section class="search-results" id="searchResults" aria-label="Search results">
+        <div class="search-results-head">
+          <p class="search-results-count" id="searchCount" role="status" aria-live="polite"></p>
+          <div class="search-nav">
+            <button id="searchPrev" type="button" aria-label="Previous match" title="Previous match">↑</button>
+            <button id="searchNext" type="button" aria-label="Next match" title="Next match">↓</button>
+            <button id="searchToggleList" type="button" aria-label="Toggle results list" aria-expanded="true"
+              title="Show or hide the results list">≡</button>
+            <button id="searchClear" type="button" aria-label="Clear search" title="Clear search">✕</button>
+          </div>
+        </div>
+        <div class="search-results-list" id="searchList"></div>
+      </section>
       <header class="hero section-panel" id="task-bank-overview">
         <p class="eyebrow">Certified Kubernetes Administrator</p>
         <h1>Hands-on task bank</h1>
@@ -166,6 +186,7 @@
       <p class="footer-note">CKA hands-on task bank · Verify before you move on · Designed around Kubernetes v1.35</p>
     </main>
   </div>
+  <script src="../assets/js/search.js"></script>
   <script src="assets/tasks.js"></script>
 </body>
 

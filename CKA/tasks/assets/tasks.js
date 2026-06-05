@@ -19,11 +19,12 @@ const DONE_KEY = "cka-tasks-done";
 const state = {
   tasks: [],
   meta: null,
-  search: "",
   sort: "recommended",
   filters: { domain: new Set(), labMode: new Set(), difficulty: new Set(), phase: new Set() },
   done: loadDone()
 };
+
+let searchApi = null;
 
 function loadDone() {
   try { return JSON.parse(localStorage.getItem(DONE_KEY)) || {}; } catch { return {}; }
@@ -219,13 +220,6 @@ function matchesFilters(task) {
   if (f.labMode.size && !f.labMode.has(task.labMode)) return false;
   if (f.difficulty.size && !f.difficulty.has(task.difficulty)) return false;
   if (f.phase.size && !f.phase.has(task.phase)) return false;
-  if (state.search) {
-    const hay = [
-      task.id, task.title, task.context, task.objective, task.learningOutcomes,
-      domainLabel(task.domain), phaseLabel(task.phase), (task.hints || []).join(" ")
-    ].join(" ").toLowerCase();
-    if (!hay.includes(state.search)) return false;
-  }
   return true;
 }
 
@@ -253,6 +247,7 @@ const taskCount = document.getElementById("taskCount");
 const noResults = document.getElementById("noResults");
 
 function render() {
+  if (searchApi) searchApi.clear();
   const filtered = sortTasks(state.tasks.filter(matchesFilters));
   grid.replaceChildren(...filtered.map(buildCard));
   noResults.style.display = filtered.length ? "none" : "block";
@@ -314,35 +309,36 @@ document.getElementById("resetFilters").addEventListener("click", () => {
     c.classList.remove("active");
     c.setAttribute("aria-pressed", "false");
   });
-  const search = document.getElementById("search");
-  search.value = "";
-  state.search = "";
-  render();
-});
-
-// Search
-document.getElementById("search").addEventListener("input", (e) => {
-  state.search = e.target.value.trim().toLowerCase();
   render();
 });
 
 // Theme toggle
 const themeButtons = [document.getElementById("themeToggle"), document.getElementById("themeMobile")].filter(Boolean);
+const darkMedia = window.matchMedia("(prefers-color-scheme: dark)");
+function effectiveDark() {
+  const attr = doc.getAttribute("data-theme");
+  if (attr === "dark") return true;
+  if (attr === "light") return false;
+  return darkMedia.matches;
+}
 function syncThemeButtons() {
-  const isDark = doc.getAttribute("data-theme") === "dark";
+  const isDark = effectiveDark();
   themeButtons.forEach((b) => {
     b.setAttribute("aria-pressed", String(isDark));
     b.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
   });
 }
 function toggleTheme() {
-  const next = doc.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  const next = effectiveDark() ? "light" : "dark";
   doc.setAttribute("data-theme", next);
   localStorage.setItem("cka-theme", next);
   syncThemeButtons();
 }
 syncThemeButtons();
 themeButtons.forEach((b) => b.addEventListener("click", toggleTheme));
+darkMedia.addEventListener("change", () => {
+  if (!localStorage.getItem("cka-theme")) syncThemeButtons();
+});
 
 // Mobile nav
 const sidebar = document.getElementById("sidebar");
@@ -389,6 +385,18 @@ function decorateExternalLinks() {
     }
   });
 }
+
+// Shared find-and-jump search across the rendered task cards.
+searchApi = initGuideSearch({
+  getSections: () => [...grid.querySelectorAll(".task-card")],
+  sectionLabel: (card) => {
+    const title = card.querySelector(".task-title")?.textContent || "";
+    return `${card.dataset.id} · ${title}`.trim();
+  },
+  emptyHint: "Try a task id, domain, or a keyword like ingress, RBAC, or etcd.",
+  groupNoun: "task",
+  mobileSearchLabel: "Search tasks"
+});
 
 async function init() {
   try {

@@ -1,0 +1,299 @@
+// Shared find-and-jump search engine used by the study guide and the task bank.
+// It marks matches across the supplied "sections", builds clickable preview
+// cards (context + a section label), supports prev/next navigation, a compact
+// mobile top-bar search, and a center-scroll + glow pulse onto the active hit.
+//
+// Required DOM (shared ids/classes on both pages):
+//   #search, #searchMobile, #searchToggleMobile, .mobile-bar, .mobile-bar-row,
+//   .search-box, #searchResults, #searchList, #searchCount, #searchToggleList,
+//   #searchPrev, #searchNext, #searchClear
+function initGuideSearch(options) {
+  const {
+    getSections,
+    sectionLabel,
+    emptyHint = "",
+    groupNoun = "section",
+    mobileSearchLabel = "Search"
+  } = options;
+
+  const searchInputs = [document.getElementById("search"), document.getElementById("searchMobile")].filter(Boolean);
+  const resultsPanel = document.getElementById("searchResults");
+  const resultsList = document.getElementById("searchList");
+  const searchCount = document.getElementById("searchCount");
+  const toggleListBtn = document.getElementById("searchToggleList");
+  const nextBtn = document.getElementById("searchNext");
+  const prevBtn = document.getElementById("searchPrev");
+  const clearBtn = document.getElementById("searchClear");
+  const mobileBarEl = document.querySelector(".mobile-bar");
+  const mobileBarRowEl = document.querySelector(".mobile-bar-row");
+  const searchBoxEl = document.querySelector(".search-box");
+  const searchToggleMobile = document.getElementById("searchToggleMobile");
+  const mobileSearchInput = document.getElementById("searchMobile");
+
+  if (!resultsPanel || !resultsList || !searchCount || !searchInputs.length) return null;
+
+  const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "PRE", "CODE", "MARK", "BUTTON"]);
+  const MAX_HITS = 120;
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+  let hits = [];
+  let activeHit = -1;
+  let searchTimer;
+
+  // Dock the panel under whichever search box is in use: inside the sticky
+  // mobile bar on phones, under the sidebar search on desktop.
+  function dockPanel(input) {
+    const anchor = input && input.id === "searchMobile" ? mobileBarRowEl : searchBoxEl;
+    if (anchor && resultsPanel.previousElementSibling !== anchor) anchor.after(resultsPanel);
+  }
+
+  function clearMarks() {
+    document.querySelectorAll("mark.search-hit").forEach((m) => {
+      const parent = m.parentNode;
+      if (!parent) return;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+  }
+
+  function snippetAround(value, index, len) {
+    const start = Math.max(0, index - 52);
+    const end = Math.min(value.length, index + len + 52);
+    let before = value.slice(start, index);
+    let after = value.slice(index + len, end);
+    if (start > 0) before = "… " + before.replace(/^\S+\s/, "");
+    if (end < value.length) after = after.replace(/\s\S+$/, "") + " …";
+    return { before, match: value.slice(index, index + len), after };
+  }
+
+  function collectHits(term) {
+    hits = [];
+    const sections = getSections() || [];
+    for (const section of sections) {
+      if (hits.length >= MAX_HITS) break;
+      const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.nodeValue.toLowerCase().includes(term)) return NodeFilter.FILTER_REJECT;
+          let p = node.parentElement;
+          while (p && p !== section) {
+            if (SKIP_TAGS.has(p.tagName)) return NodeFilter.FILTER_REJECT;
+            p = p.parentElement;
+          }
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+
+      for (const node of nodes) {
+        if (hits.length >= MAX_HITS) break;
+        const value = node.nodeValue;
+        const lower = value.toLowerCase();
+        const frag = document.createDocumentFragment();
+        let last = 0;
+        let idx = lower.indexOf(term);
+        let found = false;
+        while (idx !== -1 && hits.length < MAX_HITS) {
+          found = true;
+          if (idx > last) frag.appendChild(document.createTextNode(value.slice(last, idx)));
+          const mark = document.createElement("mark");
+          mark.className = "search-hit";
+          mark.textContent = value.slice(idx, idx + term.length);
+          frag.appendChild(mark);
+          hits.push({ mark, section, snippet: snippetAround(value, idx, term.length) });
+          last = idx + term.length;
+          idx = lower.indexOf(term, last);
+        }
+        if (found) {
+          if (last < value.length) frag.appendChild(document.createTextNode(value.slice(last)));
+          node.parentNode.replaceChild(frag, node);
+        }
+      }
+    }
+  }
+
+  function updateCount() {
+    if (!hits.length) return;
+    const groupCount = new Set(hits.map((h) => h.section)).size;
+    const capped = hits.length >= MAX_HITS ? "+" : "";
+    const pos = activeHit >= 0 ? `${activeHit + 1} / ` : "";
+    searchCount.textContent = `${pos}${hits.length}${capped} match${hits.length === 1 ? "" : "es"} in ${groupCount} ${groupNoun}${groupCount === 1 ? "" : "s"}`;
+  }
+
+  function renderResults(term) {
+    resultsList.replaceChildren();
+    if (!hits.length) {
+      searchCount.textContent = `No matches for “${term}”`;
+      const empty = document.createElement("p");
+      empty.className = "search-empty";
+      empty.textContent = emptyHint;
+      resultsList.appendChild(empty);
+      return;
+    }
+    updateCount();
+    hits.forEach((hit, i) => {
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "search-hit-card";
+      const sec = document.createElement("span");
+      sec.className = "hit-section";
+      sec.textContent = sectionLabel(hit.section);
+      const snip = document.createElement("span");
+      snip.className = "hit-snippet";
+      snip.appendChild(document.createTextNode(hit.snippet.before));
+      const m = document.createElement("mark");
+      m.textContent = hit.snippet.match;
+      snip.appendChild(m);
+      snip.appendChild(document.createTextNode(hit.snippet.after));
+      card.append(sec, snip);
+      card.addEventListener("click", () => gotoHit(i, true));
+      hit.card = card;
+      resultsList.appendChild(card);
+    });
+  }
+
+  function setListCollapsed(collapsed) {
+    resultsPanel.classList.toggle("is-collapsed", collapsed);
+    if (toggleListBtn) toggleListBtn.setAttribute("aria-expanded", String(!collapsed));
+  }
+
+  function openSearch(input) {
+    dockPanel(input);
+    resultsPanel.classList.add("open");
+    document.body.classList.add("search-open");
+    setListCollapsed(false);
+    if (mobileBarEl) mobileBarEl.classList.remove("nav-hidden");
+  }
+
+  function closeSearch() {
+    resultsPanel.classList.remove("open");
+    document.body.classList.remove("search-open");
+  }
+
+  // Smooth-scroll to a target offset, then run a callback once scrolling settles.
+  function afterScrollSettled(targetTop, callback) {
+    if (Math.abs(window.scrollY - targetTop) < 2) { callback(); return; }
+    window.scrollTo({ top: targetTop, behavior: "smooth" });
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      window.removeEventListener("scrollend", finish);
+      clearTimeout(timer);
+      callback();
+    };
+    window.addEventListener("scrollend", finish);
+    const timer = setTimeout(finish, 900);
+  }
+
+  // Apply the keyword focus highlight (active + one-shot glow). Called only
+  // once scrolling has settled so the highlight starts after the scroll ends.
+  function highlightMark(mark) {
+    hits.forEach((h) => h.mark.classList.toggle("active", h.mark === mark));
+    mark.classList.remove("flash");
+    void mark.offsetWidth;
+    mark.classList.add("flash");
+  }
+
+  // Scroll so the keyword sits at the vertical center, then focus-highlight it
+  // once scrolling settles.
+  function centerAndSpotlight(mark) {
+    let p = mark.parentElement;
+    while (p) {
+      if (p.tagName === "DETAILS" && !p.open) p.open = true;
+      p = p.parentElement;
+    }
+    const rect = mark.getBoundingClientRect();
+    const docCenterY = rect.top + window.scrollY + rect.height / 2;
+    const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+    const desired = Math.min(Math.max(docCenterY - window.innerHeight / 2, 0), maxScroll);
+    if (reduceMotion.matches) {
+      window.scrollTo({ top: desired, behavior: "auto" });
+      highlightMark(mark);
+      return;
+    }
+    afterScrollSettled(desired, () => highlightMark(mark));
+  }
+
+  function gotoHit(index, collapseOnMobile) {
+    if (!hits.length) return;
+    activeHit = (index + hits.length) % hits.length;
+    hits.forEach((h, j) => {
+      if (h.card) h.card.classList.toggle("active", j === activeHit);
+    });
+    const target = hits[activeHit];
+    if (target.card) target.card.scrollIntoView({ block: "nearest" });
+    centerAndSpotlight(target.mark);
+    updateCount();
+    if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
+  }
+
+  function collapseMobileSearch() {
+    if (mobileBarEl) mobileBarEl.classList.remove("searching");
+    if (searchToggleMobile) {
+      searchToggleMobile.textContent = "🔍";
+      searchToggleMobile.setAttribute("aria-expanded", "false");
+      searchToggleMobile.setAttribute("aria-label", mobileSearchLabel);
+    }
+  }
+
+  function clearSearch() {
+    clearTimeout(searchTimer);
+    clearMarks();
+    hits = [];
+    activeHit = -1;
+    searchInputs.forEach((input) => { if (input.value) input.value = ""; });
+    closeSearch();
+    collapseMobileSearch();
+  }
+
+  function runSearch(rawValue, input) {
+    clearMarks();
+    const term = rawValue.trim().toLowerCase();
+    activeHit = -1;
+    if (term.length < 2) {
+      hits = [];
+      closeSearch();
+      return;
+    }
+    collectHits(term);
+    openSearch(input);
+    renderResults(term);
+  }
+
+  searchInputs.forEach((input) => {
+    input.addEventListener("input", () => {
+      const value = input.value;
+      searchInputs.forEach((other) => { if (other !== input && other.value !== value) other.value = value; });
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => runSearch(value, input), 180);
+    });
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); gotoHit(activeHit + 1, true); }
+      else if (e.key === "Escape") { e.preventDefault(); clearSearch(); }
+    });
+  });
+
+  if (toggleListBtn) toggleListBtn.addEventListener("click", () => setListCollapsed(!resultsPanel.classList.contains("is-collapsed")));
+  if (nextBtn) nextBtn.addEventListener("click", () => gotoHit(activeHit + 1, false));
+  if (prevBtn) prevBtn.addEventListener("click", () => gotoHit(activeHit - 1, false));
+  if (clearBtn) clearBtn.addEventListener("click", clearSearch);
+
+  if (searchToggleMobile && mobileBarEl) {
+    searchToggleMobile.addEventListener("click", () => {
+      const active = mobileBarEl.classList.toggle("searching");
+      if (active) {
+        searchToggleMobile.textContent = "✕";
+        searchToggleMobile.setAttribute("aria-expanded", "true");
+        searchToggleMobile.setAttribute("aria-label", "Close search");
+        if (mobileSearchInput) mobileSearchInput.focus();
+      } else {
+        clearSearch();
+      }
+    });
+  }
+
+  return { clear: clearSearch };
+}
+
+window.initGuideSearch = initGuideSearch;
