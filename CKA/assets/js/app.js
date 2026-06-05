@@ -245,11 +245,14 @@ let hits = [];
 let activeHit = -1;
 let searchTimer;
 
-function updateBarHeight() {
-  if (mobileBarEl) doc.style.setProperty("--bar-h", `${mobileBarEl.offsetHeight}px`);
+const searchBoxEl = document.querySelector(".search-box");
+const mobileSearchEl = document.querySelector(".mobile-search");
+
+// Dock the results panel directly under whichever search box is in use.
+function dockPanel(input) {
+  const anchor = input && input.id === "searchMobile" ? mobileSearchEl : searchBoxEl;
+  if (anchor && resultsPanel.previousElementSibling !== anchor) anchor.after(resultsPanel);
 }
-updateBarHeight();
-window.addEventListener("resize", updateBarHeight);
 
 function clearMarks() {
   document.querySelectorAll("mark.search-hit").forEach((m) => {
@@ -360,12 +363,12 @@ function setListCollapsed(collapsed) {
   toggleListBtn.setAttribute("aria-expanded", String(!collapsed));
 }
 
-function openSearch() {
+function openSearch(input) {
+  dockPanel(input);
   resultsPanel.classList.add("open");
   searchOpen = true;
   setListCollapsed(false);
   if (mobileBarEl) mobileBarEl.classList.remove("nav-hidden");
-  updateBarHeight();
 }
 
 function closeSearch() {
@@ -396,7 +399,7 @@ function clearSearch() {
   closeSearch();
 }
 
-function runSearch(rawValue) {
+function runSearch(rawValue, input) {
   clearMarks();
   const term = rawValue.trim().toLowerCase();
   activeHit = -1;
@@ -406,7 +409,7 @@ function runSearch(rawValue) {
     return;
   }
   collectHits(term);
-  openSearch();
+  openSearch(input);
   renderResults(term);
 }
 
@@ -415,7 +418,7 @@ searchInputs.forEach((input) => {
     const value = input.value;
     searchInputs.forEach((other) => { if (other !== input && other.value !== value) other.value = value; });
     clearTimeout(searchTimer);
-    searchTimer = setTimeout(() => runSearch(value), 180);
+    searchTimer = setTimeout(() => runSearch(value, input), 180);
   });
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); gotoHit(activeHit + 1, true); }

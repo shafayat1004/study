@@ -1066,15 +1066,12 @@ code {
   display: none;
   flex-direction: column;
   border: 1px solid color-mix(in srgb, var(--accent) 28%, var(--line));
-  border-radius: 18px;
+  border-radius: 14px;
   background: var(--paper-solid);
   box-shadow: var(--shadow);
-  margin: 0 0 1rem;
+  margin: .5rem 0 0;
   overflow: hidden;
-  position: sticky;
-  top: .75rem;
-  z-index: 600;
-  max-height: min(72vh, 42rem);
+  max-height: min(60vh, 30rem);
 }
 .search-results.open {
   display: flex;
@@ -1172,15 +1169,8 @@ mark.search-hit.active {
 
 @media (max-width: 860px) {
   .search-results {
-    position: fixed;
-    left: 0;
-    right: 0;
-    top: var(--bar-h, 6.5rem);
-    margin: 0;
-    border-radius: 0 0 18px 18px;
-    border-top: 0;
-    z-index: 940;
-    max-height: 68vh;
+    margin: .5rem 0 0;
+    max-height: 60vh;
   }
 }
 
