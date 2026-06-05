@@ -22,9 +22,14 @@
   <a class="skip-link" href="#content">Skip to main content</a>
   <div class="progress" id="progress" aria-hidden="true"></div>
   <div class="mobile-bar">
-    <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
-    <strong>CKA Study Guide</strong>
-    <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+    <div class="mobile-bar-row">
+      <button aria-controls="sidebar" aria-expanded="false" aria-label="Open navigation" id="openNav" type="button">☰</button>
+      <strong>CKA Study Guide</strong>
+      <button aria-label="Toggle dark theme" aria-pressed="false" id="themeMobile" type="button">◐</button>
+    </div>
+    <div class="mobile-search">
+      <input aria-label="Search this guide" id="searchMobile" placeholder="Search this guide..." type="search" />
+    </div>
   </div>
   <div class="shell">
     <aside aria-label="Guide navigation" class="sidebar" id="sidebar">
@@ -52,8 +57,19 @@
         <div class="stat"><b>25%</b><span>Cluster architecture, install, config</span></div>
         <div class="stat"><b>GKE</b><span>Managed-Kubernetes comparison notes</span></div>
       </div>
-      <div aria-live="polite" class="no-results" id="noResults" role="status">No matching sections found. Try “Service”, “RBAC”, “etcd”, “Gateway”, or
-        “StorageClass”.</div>
+      <section class="search-results" id="searchResults" aria-label="Search results">
+        <div class="search-results-head">
+          <p class="search-results-count" id="searchCount" role="status" aria-live="polite"></p>
+          <div class="search-nav">
+            <button id="searchPrev" type="button" aria-label="Previous match" title="Previous match">↑</button>
+            <button id="searchNext" type="button" aria-label="Next match" title="Next match">↓</button>
+            <button id="searchToggleList" type="button" aria-label="Toggle results list" aria-expanded="true"
+              title="Show or hide the results list">≡</button>
+            <button id="searchClear" type="button" aria-label="Clear search" title="Clear search">✕</button>
+          </div>
+        </div>
+        <div class="search-results-list" id="searchList"></div>
+      </section>
       <header class="hero section-panel" id="comprehensive-cka-study-guide">
         <p class="eyebrow">Certified Kubernetes Administrator</p>
         <h1>CKA Study Guide</h1>

@@ -1,4 +1,5 @@
 const doc = document.documentElement;
+let searchOpen = false;
 const scrollStorageKey = `cka-scroll-position:${location.pathname}`;
 const savedTheme = localStorage.getItem("cka-theme");
 if (savedTheme) doc.setAttribute("data-theme", savedTheme);
@@ -191,7 +192,7 @@ document.addEventListener("scroll", () => {
   scrollSaveTimer = setTimeout(() => localStorage.setItem(scrollStorageKey, String(Math.round(y))), 150);
 
   // Auto-hide the mobile bar on scroll down, reveal it on scroll up.
-  if (mobileBar && !document.body.classList.contains("nav-open")) {
+  if (mobileBar && !document.body.classList.contains("nav-open") && !searchOpen) {
     if (y > lastScrollY && y > 80) {
       mobileBar.classList.add("nav-hidden");
     } else if (y < lastScrollY) {
@@ -224,50 +225,208 @@ document.querySelectorAll(".code-wrap").forEach(wrap => {
   wrap.appendChild(btn);
 });
 
-const search = document.getElementById("search");
-const noResults = document.getElementById("noResults");
-const searchStatus = document.createElement("p");
-searchStatus.className = "sr-only";
-searchStatus.setAttribute("aria-live", "polite");
-searchStatus.setAttribute("role", "status");
-search.after(searchStatus);
-function clearMarks(el) {
-  el.querySelectorAll("mark").forEach(mark => mark.replaceWith(document.createTextNode(mark.textContent)));
-  el.normalize();
-}
-function markText(el, term) {
-  if (!term || term.length < 2) return;
-  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
-    acceptNode(node) {
-      if (!node.nodeValue.toLowerCase().includes(term)) return NodeFilter.FILTER_REJECT;
-      if (node.parentElement && ["SCRIPT","STYLE","CODE","PRE"].includes(node.parentElement.tagName)) return NodeFilter.FILTER_REJECT;
-      return NodeFilter.FILTER_ACCEPT;
-    }
-  });
-  const nodes = [];
-  while (walker.nextNode()) nodes.push(walker.currentNode);
-  nodes.slice(0, 20).forEach(node => {
-    const text = node.nodeValue;
-    const i = text.toLowerCase().indexOf(term);
-    if (i < 0) return;
-    const mark = document.createElement("mark");
-    mark.textContent = text.slice(i, i + term.length);
-    node.replaceWith(document.createTextNode(text.slice(0, i)), mark, document.createTextNode(text.slice(i + term.length)));
-  });
-}
-search.addEventListener("input", () => {
-  const q = search.value.trim().toLowerCase();
-  let visible = 0;
-  sections.forEach(section => {
-    clearMarks(section);
-    const hay = section.innerText.toLowerCase();
-    const show = !q || hay.includes(q);
-    section.style.display = show ? "" : "none";
-    if (show) { visible++; markText(section, q); }
-  });
-  noResults.style.display = visible ? "none" : "block";
-  searchStatus.textContent = q ? `${visible} matching sections found.` : "Search cleared.";
+// ---- Search: find matches, preview them, and jump between hits ----
+const searchInputs = [document.getElementById("search"), document.getElementById("searchMobile")].filter(Boolean);
+const resultsPanel = document.getElementById("searchResults");
+const resultsList = document.getElementById("searchList");
+const searchCount = document.getElementById("searchCount");
+const toggleListBtn = document.getElementById("searchToggleList");
+const mobileBarEl = document.querySelector(".mobile-bar");
+const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "PRE", "CODE", "MARK", "BUTTON"]);
+const MAX_HITS = 120;
+
+const sectionLabelById = new Map();
+sections.forEach((section) => {
+  const heading = section.querySelector("h1,h2");
+  sectionLabelById.set(section.id, (heading ? heading.textContent : section.id).replace("CKA Study Guide", "Overview").trim());
 });
+
+let hits = [];
+let activeHit = -1;
+let searchTimer;
+
+function updateBarHeight() {
+  if (mobileBarEl) doc.style.setProperty("--bar-h", `${mobileBarEl.offsetHeight}px`);
+}
+updateBarHeight();
+window.addEventListener("resize", updateBarHeight);
+
+function clearMarks() {
+  document.querySelectorAll("mark.search-hit").forEach((m) => {
+    const parent = m.parentNode;
+    if (!parent) return;
+    parent.replaceChild(document.createTextNode(m.textContent), m);
+    parent.normalize();
+  });
+}
+
+function snippetAround(value, index, len) {
+  const start = Math.max(0, index - 52);
+  const end = Math.min(value.length, index + len + 52);
+  let before = value.slice(start, index);
+  let after = value.slice(index + len, end);
+  if (start > 0) before = "… " + before.replace(/^\S+\s/, "");
+  if (end < value.length) after = after.replace(/\s\S+$/, "") + " …";
+  return { before, match: value.slice(index, index + len), after };
+}
+
+function collectHits(term) {
+  hits = [];
+  for (const section of sections) {
+    if (hits.length >= MAX_HITS) break;
+    const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
+      acceptNode(node) {
+        if (!node.nodeValue.toLowerCase().includes(term)) return NodeFilter.FILTER_REJECT;
+        let p = node.parentElement;
+        while (p && p !== section) {
+          if (SKIP_TAGS.has(p.tagName)) return NodeFilter.FILTER_REJECT;
+          p = p.parentElement;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+
+    for (const node of nodes) {
+      if (hits.length >= MAX_HITS) break;
+      const value = node.nodeValue;
+      const lower = value.toLowerCase();
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      let idx = lower.indexOf(term);
+      let found = false;
+      while (idx !== -1 && hits.length < MAX_HITS) {
+        found = true;
+        if (idx > last) frag.appendChild(document.createTextNode(value.slice(last, idx)));
+        const mark = document.createElement("mark");
+        mark.className = "search-hit";
+        mark.textContent = value.slice(idx, idx + term.length);
+        frag.appendChild(mark);
+        hits.push({ mark, sectionId: section.id, snippet: snippetAround(value, idx, term.length) });
+        last = idx + term.length;
+        idx = lower.indexOf(term, last);
+      }
+      if (found) {
+        if (last < value.length) frag.appendChild(document.createTextNode(value.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      }
+    }
+  }
+}
+
+function updateCount() {
+  if (!hits.length) return;
+  const sectionCount = new Set(hits.map((h) => h.sectionId)).size;
+  const capped = hits.length >= MAX_HITS ? "+" : "";
+  const pos = activeHit >= 0 ? `${activeHit + 1} / ` : "";
+  searchCount.textContent = `${pos}${hits.length}${capped} match${hits.length === 1 ? "" : "es"} in ${sectionCount} section${sectionCount === 1 ? "" : "s"}`;
+}
+
+function renderResults(term) {
+  resultsList.replaceChildren();
+  if (!hits.length) {
+    searchCount.textContent = `No matches for “${term}”`;
+    const empty = document.createElement("p");
+    empty.className = "search-empty";
+    empty.textContent = "Try Service, RBAC, etcd, Gateway, or StorageClass.";
+    resultsList.appendChild(empty);
+    return;
+  }
+  updateCount();
+  hits.forEach((hit, i) => {
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "search-hit-card";
+    const sec = document.createElement("span");
+    sec.className = "hit-section";
+    sec.textContent = sectionLabelById.get(hit.sectionId) || hit.sectionId;
+    const snip = document.createElement("span");
+    snip.className = "hit-snippet";
+    snip.appendChild(document.createTextNode(hit.snippet.before));
+    const m = document.createElement("mark");
+    m.textContent = hit.snippet.match;
+    snip.appendChild(m);
+    snip.appendChild(document.createTextNode(hit.snippet.after));
+    card.append(sec, snip);
+    card.addEventListener("click", () => gotoHit(i, true));
+    hit.card = card;
+    resultsList.appendChild(card);
+  });
+}
+
+function setListCollapsed(collapsed) {
+  resultsPanel.classList.toggle("is-collapsed", collapsed);
+  toggleListBtn.setAttribute("aria-expanded", String(!collapsed));
+}
+
+function openSearch() {
+  resultsPanel.classList.add("open");
+  searchOpen = true;
+  setListCollapsed(false);
+  if (mobileBarEl) mobileBarEl.classList.remove("nav-hidden");
+  updateBarHeight();
+}
+
+function closeSearch() {
+  resultsPanel.classList.remove("open");
+  searchOpen = false;
+}
+
+function gotoHit(index, collapseOnMobile) {
+  if (!hits.length) return;
+  activeHit = (index + hits.length) % hits.length;
+  hits.forEach((h, j) => {
+    h.mark.classList.toggle("active", j === activeHit);
+    if (h.card) h.card.classList.toggle("active", j === activeHit);
+  });
+  const target = hits[activeHit];
+  if (target.card) target.card.scrollIntoView({ block: "nearest" });
+  target.mark.scrollIntoView({ block: "center", behavior: "smooth" });
+  updateCount();
+  if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
+}
+
+function clearSearch() {
+  clearTimeout(searchTimer);
+  clearMarks();
+  hits = [];
+  activeHit = -1;
+  searchInputs.forEach((input) => { if (input.value) input.value = ""; });
+  closeSearch();
+}
+
+function runSearch(rawValue) {
+  clearMarks();
+  const term = rawValue.trim().toLowerCase();
+  activeHit = -1;
+  if (term.length < 2) {
+    hits = [];
+    closeSearch();
+    return;
+  }
+  collectHits(term);
+  openSearch();
+  renderResults(term);
+}
+
+searchInputs.forEach((input) => {
+  input.addEventListener("input", () => {
+    const value = input.value;
+    searchInputs.forEach((other) => { if (other !== input && other.value !== value) other.value = value; });
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => runSearch(value), 180);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); gotoHit(activeHit + 1, true); }
+    else if (e.key === "Escape") { e.preventDefault(); clearSearch(); }
+  });
+});
+
+toggleListBtn.addEventListener("click", () => setListCollapsed(!resultsPanel.classList.contains("is-collapsed")));
+document.getElementById("searchNext").addEventListener("click", () => gotoHit(activeHit + 1, false));
+document.getElementById("searchPrev").addEventListener("click", () => gotoHit(activeHit - 1, false));
+document.getElementById("searchClear").addEventListener("click", clearSearch);
 
 document.querySelectorAll('a[target="_blank"]').forEach((link) => {
   const text = link.textContent.trim();
