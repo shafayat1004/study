@@ -210,6 +210,75 @@ sections.forEach(s => observer.observe(s));
 
 const progress = document.getElementById("progress");
 const mobileBar = document.querySelector(".mobile-bar");
+
+// Mobile breadcrumb: shows the current "Section › Subsection" while reading.
+const mobileCrumb = document.getElementById("mobileCrumb");
+const crumbSectionEl = document.getElementById("crumbSection");
+const crumbSubEl = mobileCrumb?.querySelector(".crumb-sub");
+const crumbHeadings = mobileCrumb ? [...document.querySelectorAll("#content .study-section h2, #content .study-section h3")] : [];
+let crumbRaf = 0;
+let lastCrumbKey = null;
+let currentSectionEl = null;
+
+// Keep --bar-h in sync with the controls bar height so the breadcrumb docks
+// exactly beneath it (and rises to the top edge once the bar auto-hides).
+function syncBarHeight() {
+  if (!mobileBar) return;
+  const h = mobileBar.classList.contains("searching") ? 0 : mobileBar.offsetHeight;
+  if (h) document.documentElement.style.setProperty("--bar-h", `${h}px`);
+}
+
+function computeCrumb() {
+  crumbRaf = 0;
+  if (!mobileCrumb || !crumbHeadings.length) return;
+  const threshold = (mobileBar ? mobileBar.getBoundingClientRect().bottom : 0) + 6;
+  let activeIndex = -1;
+  for (let i = 0; i < crumbHeadings.length; i++) {
+    if (crumbHeadings[i].getBoundingClientRect().top <= threshold) activeIndex = i;
+    else break;
+  }
+  if (activeIndex === -1) {
+    currentSectionEl = null;
+    if (lastCrumbKey !== "") { mobileCrumb.classList.add("is-hidden"); lastCrumbKey = ""; }
+    return;
+  }
+  const active = crumbHeadings[activeIndex];
+  let sectionText = "";
+  let subText = "";
+  let sectionEl = null;
+  if (active.tagName === "H2") {
+    sectionText = active.textContent.trim();
+    sectionEl = active;
+  } else {
+    subText = active.textContent.trim();
+    for (let i = activeIndex; i >= 0; i--) {
+      if (crumbHeadings[i].tagName === "H2") { sectionText = crumbHeadings[i].textContent.trim(); sectionEl = crumbHeadings[i]; break; }
+    }
+  }
+  currentSectionEl = sectionEl;
+  const key = `${sectionText}||${subText}`;
+  if (key === lastCrumbKey) return;
+  lastCrumbKey = key;
+  crumbSectionEl.textContent = sectionText;
+  crumbSubEl.textContent = subText;
+  mobileCrumb.classList.toggle("has-sub", Boolean(subText));
+  mobileCrumb.classList.remove("is-hidden");
+}
+function scheduleCrumb() {
+  if (!crumbRaf) crumbRaf = requestAnimationFrame(computeCrumb);
+}
+
+if (crumbSectionEl) {
+  crumbSectionEl.addEventListener("click", () => {
+    const target = currentSectionEl?.closest(".study-section") || currentSectionEl;
+    if (!target) return;
+    const barH = mobileBar ? mobileBar.getBoundingClientRect().height : 0;
+    const crumbH = mobileCrumb ? mobileCrumb.getBoundingClientRect().height : 0;
+    const top = target.getBoundingClientRect().top + window.scrollY - barH - crumbH - 8;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+  });
+}
+
 let lastScrollY = window.scrollY;
 let scrollSaveTimer;
 document.addEventListener("scroll", () => {
@@ -220,7 +289,8 @@ document.addEventListener("scroll", () => {
   clearTimeout(scrollSaveTimer);
   scrollSaveTimer = setTimeout(() => localStorage.setItem(scrollStorageKey, String(Math.round(y))), 150);
 
-  // Auto-hide the mobile bar on scroll down, reveal it on scroll up.
+  // Collapse the controls row on scroll down, reveal it on scroll up.
+  // The breadcrumb row stays pinned regardless.
   if (mobileBar && !document.body.classList.contains("nav-open") && !document.body.classList.contains("search-open")) {
     if (y > lastScrollY && y > 80) {
       mobileBar.classList.add("nav-hidden");
@@ -229,7 +299,13 @@ document.addEventListener("scroll", () => {
     }
   }
   lastScrollY = y;
+
+  scheduleCrumb();
 }, {passive: true});
+window.addEventListener("resize", () => { syncBarHeight(); scheduleCrumb(); });
+svgLoadPromise.then(() => { syncBarHeight(); scheduleCrumb(); });
+syncBarHeight();
+scheduleCrumb();
 
 window.addEventListener("beforeunload", () => {
   localStorage.setItem(scrollStorageKey, String(Math.round(window.scrollY)));

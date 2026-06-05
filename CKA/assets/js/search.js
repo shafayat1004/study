@@ -203,10 +203,16 @@ function initGuideSearch(options) {
       if (p.tagName === "DETAILS" && !p.open) p.open = true;
       p = p.parentElement;
     }
+    // The sticky mobile bar overlays the top of the screen, so the true visible
+    // area starts below it. Center the keyword within that visible area.
+    let topOffset = 0;
+    if (mobileBarEl && getComputedStyle(mobileBarEl).display !== "none") {
+      topOffset = Math.max(0, mobileBarEl.getBoundingClientRect().bottom);
+    }
     const rect = mark.getBoundingClientRect();
     const docCenterY = rect.top + window.scrollY + rect.height / 2;
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-    const desired = Math.min(Math.max(docCenterY - window.innerHeight / 2, 0), maxScroll);
+    const desired = Math.min(Math.max(docCenterY - (window.innerHeight + topOffset) / 2, 0), maxScroll);
     if (reduceMotion.matches) {
       window.scrollTo({ top: desired, behavior: "auto" });
       highlightMark(mark);
@@ -222,10 +228,13 @@ function initGuideSearch(options) {
       if (h.card) h.card.classList.toggle("active", j === activeHit);
     });
     const target = hits[activeHit];
-    if (target.card) target.card.scrollIntoView({ block: "nearest" });
+    const onMobile = collapseOnMobile && window.matchMedia("(max-width: 860px)").matches;
+    // Collapse the results list first so the sticky bar is at its final height
+    // before we measure and compute the centered scroll target.
+    if (onMobile) setListCollapsed(true);
+    else if (target.card) target.card.scrollIntoView({ block: "nearest" });
     centerAndSpotlight(target.mark);
     updateCount();
-    if (collapseOnMobile && window.matchMedia("(max-width: 860px)").matches) setListCollapsed(true);
   }
 
   // Update the toggle's icon without clobbering its aria-hidden glyph span.

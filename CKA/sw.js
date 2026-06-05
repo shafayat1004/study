@@ -1,4 +1,4 @@
-const CACHE_NAME = "cka-guide-v14";
+const CACHE_NAME = "cka-guide-v18";
 const APP_SHELL = [
   "./",
   "./index.html",
