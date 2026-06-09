@@ -53,6 +53,10 @@ function initGuideSearch(options) {
     return el?.localName?.toLowerCase() || el?.tagName?.toLowerCase() || "";
   }
 
+  function isInsideSvg(node) {
+    return Boolean(node.parentElement?.closest("svg"));
+  }
+
   // SVG <title>/<desc> are searchable but never painted — highlights there look
   // "hidden". Diagram <desc> often duplicates the visible caption as well.
   function svgMetaRole(node) {
@@ -129,7 +133,7 @@ function initGuideSearch(options) {
         if (hits.length >= MAX_HITS) break;
         const value = node.nodeValue;
         const lower = value.toLowerCase();
-        const meta = svgMetaRole(node);
+        const insideSvg = isInsideSvg(node);
         const frag = document.createDocumentFragment();
         let last = 0;
         let idx = lower.indexOf(term);
@@ -137,7 +141,9 @@ function initGuideSearch(options) {
         let modified = false;
         while (idx !== -1 && hits.length < MAX_HITS) {
           found = true;
-          if (meta) {
+          // Never inject HTML <mark> into SVG — it is invalid there, breaks layout,
+          // and getBoundingClientRect() returns garbage that drifts the page upward.
+          if (insideSvg) {
             const figure = diagramFigure(node);
             hits.push({
               mark: null,
@@ -275,9 +281,9 @@ function initGuideSearch(options) {
   // Scroll so the keyword sits at the vertical center, then focus-highlight it
   // once scrolling settles.
   function centerAndSpotlight(hit) {
-    const target = hit.spotlight;
-    if (!target) return;
-    let p = target.parentElement;
+    let scrollTarget = hit.spotlight;
+    if (!scrollTarget) return;
+    let p = scrollTarget.parentElement;
     while (p) {
       if (p.tagName === "DETAILS" && !p.open) p.open = true;
       p = p.parentElement;
@@ -288,8 +294,15 @@ function initGuideSearch(options) {
     if (mobileBarEl && getComputedStyle(mobileBarEl).display !== "none") {
       topOffset = Math.max(0, mobileBarEl.getBoundingClientRect().bottom);
     }
-    const rect = target.getBoundingClientRect();
-    const docCenterY = rect.top + window.scrollY + rect.height / 2;
+    let rect = scrollTarget.getBoundingClientRect();
+    if (rect.height < 2 && rect.width < 2) {
+      const fallback = scrollTarget.closest?.(".visual-card, .svg-figure, svg");
+      if (fallback && fallback !== scrollTarget) {
+        scrollTarget = fallback;
+        rect = scrollTarget.getBoundingClientRect();
+      }
+    }
+    const docCenterY = rect.top + window.scrollY + Math.max(rect.height, 1) / 2;
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const desired = Math.min(Math.max(docCenterY - (window.innerHeight + topOffset) / 2, 0), maxScroll);
     if (reduceMotion.matches) {
