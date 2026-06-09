@@ -32,7 +32,9 @@ function initGuideSearch(options) {
 
   if (!resultsPanel || !resultsList || !searchCount || !searchInputs.length) return null;
 
-  const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "PRE", "CODE", "MARK", "BUTTON"]);
+  // Skip scripts/styles and UI chrome, but search code blocks — commands like
+  // crictl and kubectl live almost entirely inside <code>/<pre> on this site.
+  const SKIP_TAGS = new Set(["SCRIPT", "STYLE", "MARK", "BUTTON"]);
   const MAX_HITS = 120;
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -47,6 +49,42 @@ function initGuideSearch(options) {
     if (anchor && resultsPanel.previousElementSibling !== anchor) anchor.after(resultsPanel);
   }
 
+  function tagName(el) {
+    return el?.localName?.toLowerCase() || el?.tagName?.toLowerCase() || "";
+  }
+
+  // SVG <title>/<desc> are searchable but never painted — highlights there look
+  // "hidden". Diagram <desc> often duplicates the visible caption as well.
+  function svgMetaRole(node) {
+    let p = node.parentElement;
+    while (p) {
+      const tag = tagName(p);
+      if ((tag === "title" || tag === "desc") && p.closest("svg")) return tag;
+      p = p.parentElement;
+    }
+    return null;
+  }
+
+  function diagramFigure(node) {
+    return node.parentElement?.closest("svg")?.closest(".visual-card, .svg-figure") || null;
+  }
+
+  function visibleCaption(figure) {
+    return figure?.querySelector(".visual-header strong") || null;
+  }
+
+  function descDuplicatesCaption(node, term) {
+    if (svgMetaRole(node) !== "desc") return false;
+    const caption = visibleCaption(diagramFigure(node));
+    return Boolean(caption && caption.textContent.toLowerCase().includes(term));
+  }
+
+  function clearFigureSpotlights() {
+    document.querySelectorAll(".search-figure-active, .search-figure-flash").forEach((el) => {
+      el.classList.remove("search-figure-active", "search-figure-flash");
+    });
+  }
+
   function clearMarks() {
     document.querySelectorAll("mark.search-hit").forEach((m) => {
       const parent = m.parentNode;
@@ -54,6 +92,7 @@ function initGuideSearch(options) {
       parent.replaceChild(document.createTextNode(m.textContent), m);
       parent.normalize();
     });
+    clearFigureSpotlights();
   }
 
   function snippetAround(value, index, len) {
@@ -74,6 +113,7 @@ function initGuideSearch(options) {
       const walker = document.createTreeWalker(section, NodeFilter.SHOW_TEXT, {
         acceptNode(node) {
           if (!node.nodeValue.toLowerCase().includes(term)) return NodeFilter.FILTER_REJECT;
+          if (descDuplicatesCaption(node, term)) return NodeFilter.FILTER_REJECT;
           let p = node.parentElement;
           while (p && p !== section) {
             if (SKIP_TAGS.has(p.tagName)) return NodeFilter.FILTER_REJECT;
@@ -89,22 +129,40 @@ function initGuideSearch(options) {
         if (hits.length >= MAX_HITS) break;
         const value = node.nodeValue;
         const lower = value.toLowerCase();
+        const meta = svgMetaRole(node);
         const frag = document.createDocumentFragment();
         let last = 0;
         let idx = lower.indexOf(term);
         let found = false;
+        let modified = false;
         while (idx !== -1 && hits.length < MAX_HITS) {
           found = true;
-          if (idx > last) frag.appendChild(document.createTextNode(value.slice(last, idx)));
-          const mark = document.createElement("mark");
-          mark.className = "search-hit";
-          mark.textContent = value.slice(idx, idx + term.length);
-          frag.appendChild(mark);
-          hits.push({ mark, section, snippet: snippetAround(value, idx, term.length) });
+          if (meta) {
+            const figure = diagramFigure(node);
+            hits.push({
+              mark: null,
+              spotlight: figure || node.parentElement?.closest("svg"),
+              section,
+              snippet: snippetAround(value, idx, term.length)
+            });
+          } else {
+            if (idx > last) frag.appendChild(document.createTextNode(value.slice(last, idx)));
+            const mark = document.createElement("mark");
+            mark.className = "search-hit";
+            mark.textContent = value.slice(idx, idx + term.length);
+            frag.appendChild(mark);
+            hits.push({
+              mark,
+              spotlight: mark,
+              section,
+              snippet: snippetAround(value, idx, term.length)
+            });
+            modified = true;
+          }
           last = idx + term.length;
           idx = lower.indexOf(term, last);
         }
-        if (found) {
+        if (found && modified) {
           if (last < value.length) frag.appendChild(document.createTextNode(value.slice(last)));
           node.parentNode.replaceChild(frag, node);
         }
@@ -195,17 +253,31 @@ function initGuideSearch(options) {
 
   // Apply the keyword focus highlight (active + one-shot glow). Called only
   // once scrolling has settled so the highlight starts after the scroll ends.
-  function highlightMark(mark) {
-    hits.forEach((h) => h.mark.classList.toggle("active", h.mark === mark));
-    mark.classList.remove("flash");
-    void mark.offsetWidth;
-    mark.classList.add("flash");
+  function highlightHit(hit) {
+    clearFigureSpotlights();
+    hits.forEach((h) => {
+      if (h.mark) h.mark.classList.toggle("active", h === hit);
+      if (!h.mark && h.spotlight) h.spotlight.classList.toggle("search-figure-active", h === hit);
+    });
+    const target = hit.spotlight;
+    if (!target) return;
+    if (hit.mark) {
+      target.classList.remove("flash");
+      void target.offsetWidth;
+      target.classList.add("flash");
+      return;
+    }
+    target.classList.remove("search-figure-flash");
+    void target.offsetWidth;
+    target.classList.add("search-figure-flash");
   }
 
   // Scroll so the keyword sits at the vertical center, then focus-highlight it
   // once scrolling settles.
-  function centerAndSpotlight(mark) {
-    let p = mark.parentElement;
+  function centerAndSpotlight(hit) {
+    const target = hit.spotlight;
+    if (!target) return;
+    let p = target.parentElement;
     while (p) {
       if (p.tagName === "DETAILS" && !p.open) p.open = true;
       p = p.parentElement;
@@ -216,16 +288,16 @@ function initGuideSearch(options) {
     if (mobileBarEl && getComputedStyle(mobileBarEl).display !== "none") {
       topOffset = Math.max(0, mobileBarEl.getBoundingClientRect().bottom);
     }
-    const rect = mark.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
     const docCenterY = rect.top + window.scrollY + rect.height / 2;
     const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
     const desired = Math.min(Math.max(docCenterY - (window.innerHeight + topOffset) / 2, 0), maxScroll);
     if (reduceMotion.matches) {
       window.scrollTo({ top: desired, behavior: "auto" });
-      highlightMark(mark);
+      highlightHit(hit);
       return;
     }
-    afterScrollSettled(desired, () => highlightMark(mark));
+    afterScrollSettled(desired, () => highlightHit(hit));
   }
 
   function gotoHit(index, collapseOnMobile) {
@@ -240,7 +312,7 @@ function initGuideSearch(options) {
     // before we measure and compute the centered scroll target.
     if (onMobile) setListCollapsed(true);
     else if (target.card) target.card.scrollIntoView({ block: "nearest" });
-    centerAndSpotlight(target.mark);
+    centerAndSpotlight(target);
     updateCount();
   }
 

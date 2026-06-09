@@ -1275,12 +1275,22 @@ body.search-open .mobile-crumb {
   color: var(--muted);
   font-size: .9rem;
 }
+mark.search-hit {
+  background: #fef08a;
+  color: #111827;
+  border-radius: .2rem;
+  padding: 0 .1rem;
+}
 mark.search-hit.active {
   background: var(--warn);
   color: #111827;
   outline: 2px solid color-mix(in srgb, var(--warn) 70%, #000);
   scroll-margin-top: 6rem;
   border-radius: .2rem;
+}
+pre mark.search-hit,
+pre mark.search-hit.active {
+  color: #111827;
 }
 
 /* Small glow pulse around the active keyword when you jump to it. */
@@ -1292,8 +1302,24 @@ mark.search-hit.active {
 mark.search-hit.flash {
   animation: search-hit-pulse 1s ease-out 1;
 }
+.visual-card.search-figure-active,
+.svg-figure.search-figure-active {
+  outline: 2px solid var(--warn);
+  outline-offset: 3px;
+}
+@keyframes search-figure-pulse {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent); }
+  30% { box-shadow: 0 0 0 .4em color-mix(in srgb, var(--warn) 50%, transparent), 0 0 .65em .2em color-mix(in srgb, var(--warn) 55%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--warn) 0%, transparent); }
+}
+.visual-card.search-figure-flash,
+.svg-figure.search-figure-flash {
+  animation: search-figure-pulse 1s ease-out 1;
+}
 @media (prefers-reduced-motion: reduce) {
   mark.search-hit.flash { animation: none; }
+  .visual-card.search-figure-flash,
+  .svg-figure.search-figure-flash { animation: none; }
 }
 
 @media (max-width: 860px) {
