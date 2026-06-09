@@ -152,9 +152,14 @@ function initGuideSearch(options) {
     });
   }
 
+  function syncLayout() {
+    window.dispatchEvent(new Event("resize"));
+  }
+
   function setListCollapsed(collapsed) {
     resultsPanel.classList.toggle("is-collapsed", collapsed);
     if (toggleListBtn) toggleListBtn.setAttribute("aria-expanded", String(!collapsed));
+    syncLayout();
   }
 
   function openSearch(input) {
@@ -163,11 +168,13 @@ function initGuideSearch(options) {
     document.body.classList.add("search-open");
     setListCollapsed(false);
     if (mobileBarEl) mobileBarEl.classList.remove("nav-hidden");
+    syncLayout();
   }
 
   function closeSearch() {
     resultsPanel.classList.remove("open");
     document.body.classList.remove("search-open");
+    syncLayout();
   }
 
   // Smooth-scroll to a target offset, then run a callback once scrolling settles.
