@@ -186,27 +186,57 @@ sections.forEach((section) => {
   const a = document.createElement("a");
   a.href = "#" + section.id;
   a.textContent = h.textContent.replace("CKA Study Guide", "Overview");
-  a.addEventListener("click", () => setNavOpen(false, {restoreFocus: false}));
+  a.addEventListener("click", () => {
+    setNavOpen(false, { restoreFocus: false });
+    updateTocActive(section.id);
+  });
   toc.appendChild(a);
 });
 
 const tocLinks = [...toc.querySelectorAll("a")];
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      tocLinks.forEach((a) => {
-        const isActive = a.getAttribute("href") === "#" + entry.target.id;
-        a.classList.toggle("active", isActive);
-        if (isActive) {
-          a.setAttribute("aria-current", "location");
-        } else {
-          a.removeAttribute("aria-current");
-        }
-      });
-    }
+let lastTocSectionId = null;
+
+// Reading line used to decide which section heading the reader has reached.
+function scrollAttentionLine() {
+  const bar = document.querySelector(".mobile-bar");
+  if (bar && getComputedStyle(bar).display !== "none") {
+    return bar.getBoundingClientRect().bottom + 8;
+  }
+  return 96;
+}
+
+function computeActiveTocSection() {
+  const line = scrollAttentionLine();
+  let active = sections[0];
+  for (const section of sections) {
+    if (section.getBoundingClientRect().top <= line) active = section;
+    else break;
+  }
+  const nearBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+  if (nearBottom) active = sections[sections.length - 1];
+  return active;
+}
+
+function updateTocActive(forceSectionId) {
+  const active = forceSectionId
+    ? sections.find((section) => section.id === forceSectionId) || computeActiveTocSection()
+    : computeActiveTocSection();
+  if (!active || active.id === lastTocSectionId) return;
+  lastTocSectionId = active.id;
+  tocLinks.forEach((a) => {
+    const isActive = a.getAttribute("href") === "#" + active.id;
+    a.classList.toggle("active", isActive);
+    if (isActive) a.setAttribute("aria-current", "location");
+    else a.removeAttribute("aria-current");
   });
-}, {rootMargin: "-35% 0px -55% 0px", threshold: 0.01});
-sections.forEach(s => observer.observe(s));
+}
+
+let tocRaf = 0;
+function scheduleTocActive() {
+  if (!tocRaf) tocRaf = requestAnimationFrame(() => { tocRaf = 0; updateTocActive(); });
+}
+
+updateTocActive();
 
 const progress = document.getElementById("progress");
 const mobileBar = document.querySelector(".mobile-bar");
@@ -301,9 +331,11 @@ document.addEventListener("scroll", () => {
   lastScrollY = y;
 
   scheduleCrumb();
+  scheduleTocActive();
 }, {passive: true});
-window.addEventListener("resize", () => { syncBarHeight(); scheduleCrumb(); });
-svgLoadPromise.then(() => { syncBarHeight(); scheduleCrumb(); });
+window.addEventListener("resize", () => { syncBarHeight(); scheduleCrumb(); scheduleTocActive(); });
+window.addEventListener("hashchange", () => scheduleTocActive());
+svgLoadPromise.then(() => { syncBarHeight(); scheduleCrumb(); scheduleTocActive(); });
 syncBarHeight();
 scheduleCrumb();
 
